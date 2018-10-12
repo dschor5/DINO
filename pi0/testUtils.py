@@ -19,6 +19,14 @@ def testResult(testName, testDesc, status):
 	print(testName + " - " + statusStr + " - " + testDesc)
 
 
+def testNotNone(testName, testDesc, measured):
+	passFail = (measured != None)
+	testDesc = testDesc + " " + \
+		"Measured=[" + str(measured) + "] "
+	testResult(testName, testDesc, passFail)	
+
+
+
 def testGreaterThan(testName, testDesc, measured, expected):
 	passFail = None
 	passFail = (measured > expected)

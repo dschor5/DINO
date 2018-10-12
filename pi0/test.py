@@ -4,9 +4,10 @@ import sys
 from testUtils  import *
 
 printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
-from DinoTime   import *
-from DinoLog    import *
-from DinoCamera import *
+from DinoTime       import *
+from DinoLog        import *
+from DinoCamera     import *
+from DinoEnvirophat import *
 
 
 def testDinoTime():
@@ -106,6 +107,9 @@ def testDinoCamera():
 	recStopTime  = []
 	duration = 5	
 
+   # Capture 6 readings, but only 5 are used for the subsequent 
+   # analysis as we want to see the time it takes to start/stop 
+   # new recordings. 
 	for i in range(6):
 		recStartStatus.append(camObj.startRecording())
 		recStartTime.append(DinoTime.getMET())
@@ -124,6 +128,57 @@ def testDinoCamera():
 		testDesc = "Check time between recordings."
 		testLessThan(testName, testDesc, recStartTime[i+1]-recStopTime[i], 0.01)
 
+def testDinoEnvirophat():
+	# Test variables
+	testName = "DinoEnvirophat"
+	testDesc = ""
+ 
+	testDesc = "Initialize class"		
+	env = DinoEnvirophat()
+	testNotEquals(testName, testDesc, env, None)
+
+	testDesc = "Test singleton"
+	obj2 = DinoEnvirophat()
+	testEquals(testName, testDesc, obj2, env)
+ 
+	# Run through a loop of tests. 
+	for i in range(10):
+   
+		value = env.getLightSensorReadings()
+		testDesc = "Iteration #" + str(i) + " - Check light 'red' channel."
+		testNotNone(testName, testDesc, value[0])
+		testDesc = "Iteration #" + str(i) + " - Check light 'green' channel."
+		testNotNone(testName, testDesc, value[1])
+		testDesc = "Iteration #" + str(i) + " - Check light 'blue' channel."
+		testNotNone(testName, testDesc, value[2])
+		testDesc = "Iteration #" + str(i) + " - Check light 'clear' channel."
+		testNotNone(testName, testDesc, value[3])
+      
+		value = env.getTemperature()
+		testDesc = "Iteration #" + str(i) + " - Check temperature."
+		testNotNone(testName, testDesc, value)      
+      
+		value = env.getPressure()
+		testDesc = "Iteration #" + str(i) + " - Check pressure."
+		testNotNone(testName, testDesc, value)
+      
+		value = env.getAcceleration()
+		testDesc = "Iteration #" + str(i) + " - Check acceleration x channel."
+		testNotNone(testName, testDesc, value[0])      
+		testDesc = "Iteration #" + str(i) + " - Check acceleration y channel."
+		testNotNone(testName, testDesc, value[1])
+		testDesc = "Iteration #" + str(i) + " - Check acceleration z channel."
+		testNotNone(testName, testDesc, value[2])	
+	
+		value = env.getMagReading()
+		testDesc = "Iteration #" + str(i) + " - Check mag x channel."
+		testNotNone(testName, testDesc, value[0])      
+		testDesc = "Iteration #" + str(i) + " - Check mag y channel."
+		testNotNone(testName, testDesc, value[1])
+		testDesc = "Iteration #" + str(i) + " - Check mag z channel."
+		testNotNone(testName, testDesc, value[2])	
+		
+		sleep(1)		
 
 # Configuration for test
 folder = "test_logs"
@@ -132,12 +187,15 @@ folder = "test_logs"
 DinoTime()
 DinoLog(folder, "results")
 
-printHeading("Test DinoTime class")
-testDinoTime()
+#printHeading("Test DinoTime class")
+#testDinoTime()
 
-printHeading("Test DinoLog class")
-testDinoLog()
+#printHeading("Test DinoLog class")
+#testDinoLog()
 
-printHeading("Test DinoCamera class")
-testDinoCamera()
+#printHeading("Test DinoCamera class")
+#testDinoCamera()
+
+printHeading("Test DinoEnivrophat class")
+testDinoEnvirophat()
 
