@@ -2,7 +2,7 @@ try:
    from gpiozero   import LED        # GPIO interface
    from gpiozero   import PWMOutputDevice
 except:
-	print("ERROR - GPIO not loaded.")
+   print("ERROR - GPIO not loaded.")
 
 
 from DinoTime import *
@@ -11,13 +11,13 @@ from DinoLog  import *
 
 class DinoGpio:
 
-	__instance = None
+   __instance = None
 
-	""" Singleton instance. """
-	def __new__(cls, servoPin, heaterPin, coolerPin):
-		if(DinoGpio.__instance is None):
-			DinoGpio.__instance = object.__new__(cls)
-		return DinoGpio.__instance
+   """ Singleton instance. """
+   def __new__(cls, servoPin, heaterPin, coolerPin):
+      if(DinoGpio.__instance is None):
+         DinoGpio.__instance = object.__new__(cls)
+      return DinoGpio.__instance
 
 
    def startServo(self, duration, speed):
