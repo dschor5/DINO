@@ -44,14 +44,15 @@ class DinoCamera:
 		self.__recStartMet = DinoTime.getMET()
 		self.__isRecording = True
 
-		if(useStub == True):
-			DinoLog.logMsg("STUB - Start PiCamera file=[" + self.__filepath + "]")
+		try:
+			camera.resolution = (800, 600)
+			camera.framerate  = 15
+			camera.start_recording(self.__filepath);
+			DinoLog.logMsg("Start PiCamera file=[" + self.__filepath + "]")
+		except:
+			DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + self.__filepath + "]")
 			return False
-		
-		camera.resolution = (800, 600)
-		camera.framerate  = 15
-		camera.start_recording(self.__filepath);
-		DinoLog.logMsg("Start PiCamera file=[" + self.__filepath + "]")
+			
 		return True
 
 	""" Returns recording time or -1 if failed. """		

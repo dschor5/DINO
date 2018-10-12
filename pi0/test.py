@@ -199,24 +199,31 @@ folder = "test_logs"
 DinoTime()
 DinoLog(folder, "results")
 
-printHeading("Test DinoTime class")
-testDinoTime()
+if((len(sys.argv) == 1) or ("DinoTime" in sys.argv)):
+	printHeading("Test DinoTime class")
+	testDinoTime()
 
-printHeading("Test DinoLog class")
-testDinoLog()
+if((len(sys.argv) == 1) or ("DinoLog" in sys.argv)):
+	printHeading("Test DinoLog class")
+	testDinoLog()
+	
+if((len(sys.argv) == 1) or ("DinoCamera" in sys.argv)):
+	printHeading("Test DinoCamera class")
+	testDinoCamera()
+	
+if((len(sys.argv) == 1) or ("DinoEnvirophat" in sys.argv)):
+	printHeading("Test DinoEnvirophat class")
+	testDinoEnvirophat()
 
-printHeading("Test DinoCamera class")
-testDinoCamera()
+if((len(sys.argv) == 1) or ("DinoSerial" in sys.argv)):
+	printHeading("Test DinoSerial class")
+	testDinoSerial()
 
-printHeading("Test DinoEnivrophat class")
-testDinoEnvirophat()
+if((len(sys.argv) == 1) or ("DinoGpio" in sys.argv)):
+	printHeading("Test DinoGpio class")
+	testDinoGpio()
 
-printHeading("Test DinoSerial class")
-testDinoSerial()
-
-printHeading("Test DinoGpio class")
-testDinoGpio()
-
-printHeading("Test DinoSpectrometer class")
-testDinoSpectrometer()
+if((len(sys.argv) == 1) or ("DinoSpectrometer" in sys.argv)):
+	printHeading("Test DinoSpectrometer class")
+	testDinoSpectrometer()
 

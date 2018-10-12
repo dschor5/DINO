@@ -3,11 +3,9 @@ try:
 	from envirophat import leds     # control leds on the board
 	from envirophat import weather  # temperature and pressure sensors
 	from envirophat import motion   # accelerometer sensor
-	useStub = False
 	leds.off()
 except:
 	print("ERROR - EnviropHat not loaded.")
-	useStub = True
 
 
 from DinoTime import *
@@ -27,9 +25,6 @@ class DinoEnvirophat:
 	""" Returns tuple with four values for R, G, B, and CLEAR values. """
 	def getLightSensorReadings(self):
 		data = (None, None, None, None)
-		if(useStub == True):
-			DinoLog.logMsg("STUB - Envirophat read light sensor.")
-			return data
 		try:
 			data = light.raw()
 		except:
@@ -38,30 +33,38 @@ class DinoEnvirophat:
             
 	""" Read temperature in degree C. """
 	def getTemperature(self):
-		if(useStub == True):
-			DinoLog.logMsg("STUB - Envirophat read temperature.")
-			return None
-		return weather.temperature()
+		try:
+		   value = weather.temperature()
+		except:
+			DinoLog.logMsg("ERROR - Envirophat read temperature.")
+			value = None
+		return value
    
 	""" Return pressure in Pa."""
 	def getPressure(self):
-		if(useStub == True):
-			DinoLog.logMsg("STUB - Envirophat read pressure.")
-			return None
-		return weather.pressure(unit='Pa')      
+		try:
+			value = weather.pressure(unit='Pa')
+		except:
+			DinoLog.logMsg("ERROR - Envirophat read pressure.")
+			value = None
+		return value
 
 	""" Returns tuple for acceleration x, y, and z. """
 	def getAcceleration(self):
-		if(useStub == True):
-			DinoLog.logMsg("STUB - Envirophat read acceleration.")
-			return (None, None, None)
-		return motion.accelerometer()
+		try:
+			value = motion.accelerometer()
+		except:
+			DinoLog.logMsg("ERROR - Envirophat read acceleration.")
+			value = (None, None, None)
+		return value
    
 	""" Returns tuple for mag_x, mag_y, and mag_z readings."""
 	def getMagReading(self):
-		if(useStub == True):
-			DinoLog.logMsg("STUB - Envirophat read magnetometer.")
-			return (None, None, None)
-		return motion.magnetometer()   
+		try:
+			value = motion.magnetometer()
+		except:
+			DinoLog.logMsg("ERROR - Envirophat read magnetometer.")
+			value = (None, None, None)
+		return value
 
 
