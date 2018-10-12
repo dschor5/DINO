@@ -4,10 +4,13 @@ import sys
 from testUtils  import *
 
 printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
-from DinoTime       import *
-from DinoLog        import *
-from DinoCamera     import *
-from DinoEnvirophat import *
+from DinoTime         import *
+from DinoLog          import *
+from DinoCamera       import *
+from DinoEnvirophat   import *
+from DinoSerial       import *
+from DinoGpio         import *
+from DinoSpectrometer import *
 
 
 def testDinoTime():
@@ -180,6 +183,15 @@ def testDinoEnvirophat():
 		
 		sleep(1)		
 
+def testDinoSerial():
+	pass
+	
+def testDinoGpio():
+	pass
+	
+def testDinoSpectrometer():
+	pass	
+
 # Configuration for test
 folder = "test_logs"
 
@@ -187,15 +199,24 @@ folder = "test_logs"
 DinoTime()
 DinoLog(folder, "results")
 
-#printHeading("Test DinoTime class")
-#testDinoTime()
+printHeading("Test DinoTime class")
+testDinoTime()
 
-#printHeading("Test DinoLog class")
-#testDinoLog()
+printHeading("Test DinoLog class")
+testDinoLog()
 
-#printHeading("Test DinoCamera class")
-#testDinoCamera()
+printHeading("Test DinoCamera class")
+testDinoCamera()
 
 printHeading("Test DinoEnivrophat class")
 testDinoEnvirophat()
+
+printHeading("Test DinoSerial class")
+testDinoSerial()
+
+printHeading("Test DinoGpio class")
+testDinoGpio()
+
+printHeading("Test DinoSpectrometer class")
+testDinoSpectrometer()
 

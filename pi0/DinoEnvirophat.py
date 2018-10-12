@@ -26,10 +26,15 @@ class DinoEnvirophat:
 
 	""" Returns tuple with four values for R, G, B, and CLEAR values. """
 	def getLightSensorReadings(self):
+		data = (None, None, None, None)
 		if(useStub == True):
 			DinoLog.logMsg("STUB - Envirophat read light sensor.")
-			return (None, None, None, None)
-		return light.raw()
+			return data
+		try:
+			data = light.raw()
+		except:
+			DinoLog.logMsg("ERROR - Envirophat fail to read light sensor.")
+		return data
             
 	""" Read temperature in degree C. """
 	def getTemperature(self):
