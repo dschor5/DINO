@@ -184,13 +184,13 @@ def testDinoEnvirophat():
       sleep(1)      
 
 def testDinoSerial():
-   pass
+   print("No tests defined.")
    
 def testDinoGpio():
-   pass
+   print("No tests defined.")
    
 def testDinoSpectrometer():
-   pass   
+   print("No tests defined.")
 
 # Configuration for test
 folder = "test_logs"

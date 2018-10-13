@@ -35,44 +35,48 @@ class DinoCamera:
 
    """ Returns True for success. """
    def startRecording(self):
+      status = True
+   
       if(self.__isRecording == True):
          DinoLog.logMsg("ERROR - PiCamera already recording.")
-         return False
+         status = False
+      else:
 
-      timestamp = DinoTime.getTimestampStr()
-      self.__filepath = self.__folder + "/" + self.__filename + "_" + timestamp + ".h264"
-      self.__recStartMet = DinoTime.getMET()
-      self.__isRecording = True
+         timestamp = DinoTime.getTimestampStr()
+         self.__filepath = self.__folder + "/" + self.__filename + "_" + timestamp + ".h264"
+         self.__recStartMet = DinoTime.getMET()
+         self.__isRecording = True
 
-      try:
-         camera.resolution = (800, 600)
-         camera.framerate  = 15
-         camera.start_recording(self.__filepath);
-         DinoLog.logMsg("Start PiCamera file=[" + self.__filepath + "]")
-      except:
-         DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + self.__filepath + "]")
-         return False
+         try:
+            camera.resolution = (800, 600)
+            camera.framerate  = 15
+            camera.start_recording(self.__filepath);
+            DinoLog.logMsg("Start PiCamera file=[" + self.__filepath + "]")
+         except:
+            DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + self.__filepath + "]")
+            status = False
          
-      return True
+      return status
 
    """ Returns recording time or -1 if failed. """      
    def stopRecording(self):
+      recTime = 0
+      
       if(self.__isRecording == False):
          DinoLog.logMsg("WARNING - PiCamera already stopped.")
-         return -1
+         recTime = -1
+      else:
+         recTime = DinoTime.getMET() - self.__recStartMet
+         self.__recStartMet = 0
+         self.__isRecording = False
 
-      recTime = DinoTime.getMET() - self.__recStartMet
-      self.__recStartMet = 0
-      self.__isRecording = False
-
-      if(useStub == True):
-         DinoLog.logMsg("STUB - Stop PiCamera file=[" + self.__filepath + "] " + \
-            "duration=[" + str(recTime) + "sec]")
-         return recTime
-
-      camera.stop_recording()
-      DinoLog.logMsg("Stop PiCamera file=[" + self.__filepath + "] " + \
-         "duration=[" + str(recTime) + "sec]")
+         try:
+            camera.stop_recording()
+            DinoLog.logMsg("Stop PiCamera file=[" + self.__filepath + "] " + \
+               "duration=[" + str(recTime) + "sec]")
+         except:
+            DinoLog.logMsg("ERROR - Failed to stop PiCamera PiCamera file=[" + self.__filepath + "] ")
+         
       return recTime
 
 
