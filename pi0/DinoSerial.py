@@ -1,16 +1,14 @@
+from DinoConstants import *
+from DinoTime      import *
+from DinoLog       import *
+
 try:
-   useStub = False
-   
+   pass
 except:
-   print("ERROR - Serial interface not loaded.")
-   useStub = True
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Serial interface not loaded.")
 
 
-from DinoTime import *
-from DinoLog  import *
-
-
-class DinoSerial:
+class DinoSerial(object):
 
    __instance = None
 
@@ -18,6 +16,9 @@ class DinoSerial:
    def __new__(cls):
       if(DinoSerial.__instance is None):
          DinoSerial.__instance = object.__new__(cls)
+         DinoSerial.__
       return DinoSerial.__instance
 
-
+   @staticmethod
+   def __readSerialThread():
+      pass

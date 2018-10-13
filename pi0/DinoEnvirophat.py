@@ -1,3 +1,7 @@
+from DinoConstants import *
+from DinoTime      import *
+from DinoLog       import *
+
 try:
    from envirophat import light    # light sensor
    from envirophat import leds     # control leds on the board
@@ -5,14 +9,10 @@ try:
    from envirophat import motion   # accelerometer sensor
    leds.off()
 except:
-   print("ERROR - EnviropHat not loaded.")
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Envirophat not loaded.")
 
 
-from DinoTime import *
-from DinoLog  import *
-
-
-class DinoEnvirophat:
+class DinoEnvirophat(object):
 
    __instance = None
 

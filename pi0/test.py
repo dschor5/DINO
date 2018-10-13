@@ -1,16 +1,19 @@
-from time       import *
+from   time import *
 import os
 import sys
-from testUtils  import *
+
+from DinoConstants import *  # Project constants
+from DinoTestUtils import *  # Test utilities
 
 printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
-from DinoTime         import *
-from DinoLog          import *
-from DinoCamera       import *
-from DinoEnvirophat   import *
-from DinoSerial       import *
-from DinoGpio         import *
-from DinoSpectrometer import *
+from DinoTime         import *  # Time keeping (Real-time + MET)
+from DinoLog          import *  # Logging features
+from DinoCamera       import *  # PiCamera interface
+from DinoEnvirophat   import *  # Envirophat interface
+from DinoSerial       import *  # Serial data interface
+from DinoGpio         import *  # GPIO interface for servo, heater, and cooler
+from DinoSpectrometer import *  # Spectrometer interface
+
 
 
 def testDinoTime():
@@ -21,7 +24,7 @@ def testDinoTime():
  
    testDesc = "Initialize class"      
    obj1 = DinoTime()
-   testNotEquals(testName, testDesc, obj1, None)
+   testNotNone(testName, testDesc, obj1)
 
    testDesc = "Test singleton"
    obj2 = DinoTime()
@@ -32,14 +35,14 @@ def testDinoTime():
       refMet = DinoTime.getMET()
       sleep(i / 10)
       met = DinoTime.getMET()
-      testEquals(testName, testDesc, met-refMet, i / 10, 0.1)
+      testEquals(testName, testDesc, met-refMet, i / 10, 0.01)
 
    testDesc = "Check calculated METs at 1Hz."
    for i in range(5):
       refMet = DinoTime.getMET()
       sleep(i)
       met = DinoTime.getMET()
-      testEquals(testName, testDesc, met-refMet, i, 0.01)
+      testEquals(testName, testDesc, met-refMet, float(i), 0.01)
 
 
 def testDinoLog():
@@ -69,7 +72,7 @@ def testDinoCamera():
  
    testDesc = "Initialize class"      
    camObj = DinoCamera(folder, "video")
-   testNotEquals(testName, testDesc, camObj, None)
+   testNotNone(testName, testDesc, camObj)
 
    testDesc = "Test singleton"
    obj2 = DinoCamera(folder, "video-diff")
@@ -100,7 +103,7 @@ def testDinoCamera():
    testEquals(testName, testDesc, camObj.isRecording(), False)   
 
    testDesc = "Recorded for more than 5 sec."
-   testGreaterThan(testName, testDesc, recTime, 5)
+   testGreaterThan(testName, testDesc, recTime, 5.0)
 
    # Start and stop recordings every 5 seconds to baseline
    # the overhead for creating/saving files. 
@@ -108,7 +111,7 @@ def testDinoCamera():
    recStartTime = []
    recDuration  = []
    recStopTime  = []
-   duration = 5   
+   duration = 5.0   
 
    # Capture 6 readings, but only 5 are used for the subsequent 
    # analysis as we want to see the time it takes to start/stop 
@@ -138,7 +141,7 @@ def testDinoEnvirophat():
  
    testDesc = "Initialize class"      
    env = DinoEnvirophat()
-   testNotEquals(testName, testDesc, env, None)
+   testNotNone(testName, testDesc, env)
 
    testDesc = "Test singleton"
    obj2 = DinoEnvirophat()

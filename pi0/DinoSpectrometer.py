@@ -1,16 +1,14 @@
+from DinoConstants import *
+from DinoTime      import *
+from DinoLog       import *
+
 try:
-   useStub = False
-   
+   pass   
 except:
-   print("ERROR - Spectrometer not loaded.")
-   useStub = True
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Spectrometer interface not loaded.")
+   
 
-
-from DinoTime import *
-from DinoLog  import *
-
-
-class DinoSpectrometer:
+class DinoSpectrometer(object):
 
    __instance = None
 

@@ -4,7 +4,7 @@ import sys
 
 from DinoTime import *
 
-class DinoLog:
+class DinoLog(object):
 
    __instance = None
    

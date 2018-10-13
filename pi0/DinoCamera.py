@@ -1,13 +1,11 @@
+from DinoConstants import *
+from DinoTime      import *
+from DinoLog       import *
+
 try:
    from picamera import PiCamera # NoIR camera
-   useStub = False
 except:
-   print("ERROR - PiCamera not loaded.")
-   useStub = True
-
-
-from DinoTime import *
-from DinoLog  import *
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - GPIO not loaded.")
 
 
 class DinoCamera:

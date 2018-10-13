@@ -3,6 +3,18 @@
 # Constants
 ###############################################################################
 
+# Colors for printing output using ANSI escape sequences. 
+# From: http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
+COLORS = {
+   'TEST_PASS' : '\033[92m',  # Green
+   'TEST_FAIL' : '\033[91m',  # Red
+   'VALUE'     : '\033[93m',  # Yellow
+   'NORMAL'    : '\033[0m',   # White
+   'HEADING'   : '\033[95m',  # Magenta
+   'DECOR'     : '\033[94m',  # Purple
+   'BOLD'      : '\033[1m'    # White/bold
+   }
+
 # Possible flight states sent by New Shepard vehicle to the payload.
 # From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
 FLIGHT_STATES = {
@@ -74,6 +86,7 @@ NL_KEYS = [
                            #     Same format as LIFTOFF_WARNING.  
    'FAULT_WARNING',        # 21) Warning triggered in anticipation of an abnormally hard landing.
                            #     Same format as LIFTOFF_WARNING.  
+   ]
 
 # Telemetry keys recorded by the software in addition to the info from the vehicle.
 # From: "HAB & DINOLAB Software Command Requirements.xlsx"

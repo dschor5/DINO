@@ -1,15 +1,15 @@
+from DinoConstants import *
+from DinoTime      import *
+from DinoLog       import *
+
 try:
    from gpiozero   import LED        # GPIO interface
    from gpiozero   import PWMOutputDevice
 except:
-   print("ERROR - GPIO not loaded.")
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - GPIO not loaded.")
 
 
-from DinoTime import *
-from DinoLog  import *
-
-
-class DinoGpio:
+class DinoGpio(object):
 
    __instance = None
 
