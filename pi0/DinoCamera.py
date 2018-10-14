@@ -8,7 +8,7 @@ except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - GPIO not loaded.")
 
 
-class DinoCamera:
+class DinoCamera(object):
 
    __instance = None
 
@@ -21,6 +21,10 @@ class DinoCamera:
          DinoCamera.__filepath = ""
          DinoCamera.__isRecording = False
          DinoCamera.__recStartMet = 0
+         try:
+            DinoCamera.__camera = PiCamera()
+         except:
+            DinoLog.logMsg("ERROR - Could not create PiCamera() object.")
       return DinoCamera.__instance
 
 
@@ -46,9 +50,9 @@ class DinoCamera:
          self.__isRecording = True
 
          try:
-            camera.resolution = (800, 600)
-            camera.framerate  = 15
-            camera.start_recording(self.__filepath);
+            self.__camera.resolution = (800, 600)
+            self.__camera.framerate  = 15
+            self.__camera.start_recording(self.__filepath);
             DinoLog.logMsg("Start PiCamera file=[" + self.__filepath + "]")
          except:
             DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + self.__filepath + "]")
@@ -69,7 +73,7 @@ class DinoCamera:
          self.__isRecording = False
 
          try:
-            camera.stop_recording()
+            self.__camera.stop_recording()
             DinoLog.logMsg("Stop PiCamera file=[" + self.__filepath + "] " + \
                "duration=[" + str(recTime) + "sec]")
          except:
