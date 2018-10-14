@@ -5,7 +5,8 @@ import sys
 from DinoConstants import *  # Project constants
 from DinoTestUtils import *  # Test utilities
 
-printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
+printHeading("Start initialization (" + strftime("%Y%m%d-%H%M%S") + ")")
+
 from DinoTime         import *  # Time keeping (Real-time + MET)
 from DinoLog          import *  # Logging features
 from DinoCamera       import *  # PiCamera interface
@@ -14,6 +15,8 @@ from DinoSerial       import *  # Serial data interface
 from DinoGpio         import *  # GPIO interface for servo, heater, and cooler
 from DinoSpectrometer import *  # Spectrometer interface
 
+printHeading("End initialization (" + strftime("%Y%m%d-%H%M%S") + ")")
+printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
 
 
 def testDinoTime():
@@ -230,3 +233,4 @@ if((len(sys.argv) == 1) or ("DinoSpectrometer" in sys.argv)):
    printHeading("Test DinoSpectrometer class")
    testDinoSpectrometer()
 
+printHeading("End test (" + strftime("%Y%m%d-%H%M%S") + ")")

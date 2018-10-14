@@ -1,17 +1,11 @@
 from time import *
 from DinoConstants import *
 
-firstTime = True
-
 
 def printHeading(msg):
-   global firstTime
    global COLORS 
-   if(firstTime != True):
-      print()
-   else:
-      firstTime = False
    print(COLORS['HEADING'] + "*** " + str(msg) + COLORS['NORMAL'])
+
 
 def formatValue(value):
    valueStr = ""
