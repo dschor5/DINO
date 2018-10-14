@@ -5,7 +5,7 @@ from DinoLog       import *
 try:
    from picamera import PiCamera # NoIR camera
 except:
-   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - GPIO not loaded.")
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - PiCamera not loaded.")
 
 
 class DinoCamera(object):
