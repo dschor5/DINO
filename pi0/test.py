@@ -108,34 +108,38 @@ def testDinoCamera():
    testDesc = "Recorded for more than 5 sec."
    testGreaterThan(testName, testDesc, recTime, 5.0)
 
-   # Start and stop recordings every 5 seconds to baseline
-   # the overhead for creating/saving files. 
-   recStartStatus = []
-   recStartTime = []
-   recDuration  = []
-   recStopTime  = []
-   duration = 5.0   
+   durations = [5.0, 30.0, 60.0, 120.0, 180.0, 300.0]
+   for j in durations:
+      # Start and stop recordings every 5 seconds to baseline
+      # the overhead for creating/saving files. 
+      recStartStatus = []
+      recStartTime = []
+      recDuration  = []
+      recStopTime  = []
+      duration = j   
 
-   # Capture 6 readings, but only 5 are used for the subsequent 
-   # analysis as we want to see the time it takes to start/stop 
-   # new recordings. 
-   for i in range(6):
-      recStartStatus.append(camObj.startRecording())
-      recStartTime.append(DinoTime.getMET())
-      sleep(duration)
-      recDuration.append(camObj.stopRecording())
-      recStopTime.append(DinoTime.getMET())
+      # Capture 6 readings, but only 5 are used for the subsequent 
+      # analysis as we want to see the time it takes to start/stop 
+      # new recordings. 
+      for i in range(6):
+         recStartStatus.append(camObj.startRecording())
+         recStartTime.append(DinoTime.getMET())
+         sleep(duration)
+         recDuration.append(camObj.stopRecording())
+         recStopTime.append(DinoTime.getMET())
    
-   # Check the results of the previous tests.
-   for i in range(5):
-      testDesc = "PiCamera started rec #" + str(i) + "."
-      testEquals(testName, testDesc, recStartStatus[i], True)
-      testDesc = "PiCamera stopped rec #" + str(i) + "."
-      testEquals(testName, testDesc, recDuration[i]>0, True)
-      testDesc = "PiCamera rec #" + str(i) + " duration. "
-      testInRange(testName, testDesc, recDuration[i], duration-0.01, duration+0.01)
-      testDesc = "Check time between recordings."
-      testLessThan(testName, testDesc, recStartTime[i+1]-recStopTime[i], 0.01)
+      # Check the results of the previous tests.
+      for i in range(5):
+         testDesc = "PiCamera started rec #" + str(i) + "."
+         testEquals(testName, testDesc, recStartStatus[i], True)
+         testDesc = "PiCamera stopped rec #" + str(i) + "."
+         testEquals(testName, testDesc, recDuration[i]>0, True)
+         testDesc = "PiCamera rec #" + str(i) + " duration. "
+         testInRange(testName, testDesc, recDuration[i], duration-0.01, duration+0.01)
+         testDesc = "Check time between recordings."
+         testLessThan(testName, testDesc, recStartTime[i+1]-recStopTime[i], 0.01)
+      
+      
 
 def testDinoEnvirophat():
    # Test variables
