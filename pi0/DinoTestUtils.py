@@ -4,11 +4,9 @@ from DinoConstants import *
 firstTime = True
 
 
-
 def printHeading(msg):
    global firstTime
    global COLORS 
-   
    if(firstTime != True):
       print()
    else:
@@ -44,7 +42,17 @@ def testNotNone(testName, testDesc, measured):
    testDesc = testDesc + " Measured=[" + formatValue(measured) + "] "
    testResult(testName, testDesc, passFail)   
 
+def testIsTrue(testName, testDesc, measured):
+   global COLORS
+   passFail = (measured == True)
+   testDesc = testDesc + " Measured=[" + formatValue(measured) + "] "
+   testResult(testName, testDesc, passFail)   
 
+def testIsFalse(testName, testDesc, measured):
+   global COLORS
+   passFail = (measured == False)
+   testDesc = testDesc + " Measured=[" + formatValue(measured) + "] "
+   testResult(testName, testDesc, passFail)   
 
 def testGreaterThan(testName, testDesc, measured, expected):
    passFail = None
@@ -58,6 +66,20 @@ def testGreaterThan(testName, testDesc, measured, expected):
          "Measured=[" + formatValue(measured) + "] > " + \
          "Expected=[" + formatValue(expected) + "]"      
    testResult(testName, testDesc, passFail)   
+   
+   
+def testGreaterThanOrEquals(testName, testDesc, measured, expected):
+   passFail = None
+   passFail = (measured >= expected)
+   if(isinstance(measured, float) or isinstance(expected, float)):
+      testDesc = testDesc + " " + \
+         "Measured=[" + formatValue(measured) + "] >= " + \
+         "Expected=[" + formatValue(expected) + "]"
+   else:
+      testDesc = testDesc + " " + \
+         "Measured=[" + formatValue(measured) + "] >= " + \
+         "Expected=[" + formatValue(expected) + "]"      
+   testResult(testName, testDesc, passFail)         
 
 
 def testLessThan(testName, testDesc, measured, expected):
@@ -73,6 +95,19 @@ def testLessThan(testName, testDesc, measured, expected):
          "Expected=[" + formatValue(expected) + "]"      
    testResult(testName, testDesc, passFail)   
 
+
+def testLessThanOrEquals(testName, testDesc, measured, expected):
+   passFail = None
+   passFail = (measured <= expected)
+   if(isinstance(measured, float) or isinstance(expected, float)):
+      testDesc = testDesc + " " + \
+         "Measured=[" + formatValue(measured) + "] <= " + \
+         "Expected=[" + formatValue(expected) + "]"
+   else:
+      testDesc = testDesc + " " + \
+         "Measured=[" + formatValue(measured) + "] <= " + \
+         "Expected=[" + formatValue(expected) + "]"      
+   testResult(testName, testDesc, passFail)  
 
 def testInRange(testName, testDesc, measured, minExpected, maxExpected):
    passFail = None
