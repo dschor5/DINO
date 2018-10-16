@@ -45,14 +45,14 @@ class DinoCamera(object):
          The timestamp and extension are appended to the name provided.
       """
       if(DinoCamera.__instance is None):
-         DinoCamera.__instance = object.__new__(cls)
-         DinoCamera.__folder   = folder
-         DinoCamera.__filename = filename
-         DinoCamera.__filepath = ""
-         DinoCamera.__count    = 0
-         DinoCamera.__single   = True
-         DinoCamera.__stop     = False
-         DinoCamera.__thread   = None
+         DinoCamera.__instance  = object.__new__(cls)
+         DinoCamera.__folder    = folder
+         DinoCamera.__filename  = filename
+         DinoCamera.__filepath  = ""
+         DinoCamera.__count     = 0
+         DinoCamera.__single    = True
+         DinoCamera.__stop      = True
+         DinoCamera.__thread    = None
 
          # Create lock object to protect shared resources
          # between the PiCamera() object and the 
@@ -77,7 +77,20 @@ class DinoCamera(object):
       """
       Return True if thread is active and PiCamera is recording.
       """
-      return (self.__thread is not None)
+      self.__lock.acquire()
+      recording = (self.__stop == False)
+      self.__lock.release()
+      return recording
+
+
+   def getNumRecordings(self):
+      """
+      Return the number of recordings made since the start of the program.
+      """
+      self.__lock.acquire()
+      num = self.__count
+      self.__lock.release()
+      return num
 
 
    def getFilename(self):
@@ -110,13 +123,13 @@ class DinoCamera(object):
          False if it was already recording or failed to start a new recording.
       """
       # Ensure there is no recording in progress.
-      if((self.__thread is not None) and (self.__thread.is_alive())):
+      if(self.isRecording() == True):
          DinoLog.logMsg("ERROR - PiCamera recording already in progress.")
          return False
       
       # Validate input parameters
-      if((duration < self.MIN_DURATION) and (duration > self.MAX_DURATION)):
-         DinoLog.logMsg("ERROR - Invalid PiCamera recording duration.")
+      if((duration < self.MIN_DURATION) or (duration > self.MAX_DURATION)):
+         DinoLog.logMsg("ERROR - Invalid PiCamera recording duration=[" + str(duration) + "].")
          return False
 
       # Record settings and start thread
@@ -124,17 +137,21 @@ class DinoCamera(object):
 
       # Settings protected by re-entrant lock
       self.__lock.acquire()
-      self.__single = single
-      self.__stop   = False
+      self.__single    = single
+      self.__stop      = False
+      self.__recording = True
       self.__lock.release()
    
       # Start thread.
       try:
          self.__thread = Thread(target=self.__run).start()
+         status = True
       except:
-         self.__thread = None
          DinoLog.logMsg("ERROR - Could not start PiCamera thread.")
-      return self.isRecording()
+         status = False
+
+      return status
+
 
    def stopRecording(self):
       """ 
@@ -151,6 +168,7 @@ class DinoCamera(object):
       """
       self.__lock.acquire()
       self.__stop = True
+      self.__recording = False
       self.__lock.release()
       if((self.__thread is not None) and (self.__thread.is_alive())):
          self.__thread.join()
@@ -183,11 +201,12 @@ class DinoCamera(object):
          self.__lock.acquire()
          self.__filepath = self.__folder + "/" + self.__filename + "_" + timestamp + ".h264"
          filepath = self.__filepath
+         self.__count = self.__count + 1
          self.__lock.release()
 
          # Start new recording
          try:
-            self.__camera.start_recording(filepath);
+            print(self.__camera.start_recording(filepath))
             DinoLog.logMsg("Start PiCamera file=[" + filepath + "]")
          except:
             DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + filepath + "]")
@@ -197,7 +216,7 @@ class DinoCamera(object):
          recStartTime = DinoTime.getMET() 
          recTime = DinoTime.getMET() - recStartTime  
          while((recTime <= self.__duration) and (stop == False)):
-            time.sleep(0.2)
+            time.sleep(1)
             self.__lock.acquire()
             stop = self.__stop
             self.__lock.release()   
@@ -209,6 +228,11 @@ class DinoCamera(object):
             DinoLog.logMsg("Stop PiCamera file=[" + filepath + "] duration=[" + str(recTime) + "sec]")
          except:
             DinoLog.logMsg("ERROR - Failed to stop PiCamera PiCamera file=[" + filepath + "] ")
- 
+
+      # Reset thread variables
+      self.__lock.acquire()
+      self.__stop = True
+      self.__single = True
+      self.__lock.release()
 
 

@@ -82,12 +82,27 @@ def testDinoCamera():
    testEquals(testName, testDesc, obj2, camObj)
 
    testDesc = "Check PiCamera default recording mode=OFF."
-   testEquals(testName, testDesc, camObj.isRecording(), False)   
+   testEquals(testName, testDesc, camObj.isRecording(), False) 
 
+   testDesc = "Check number of recordings on boot."
+   testEquals(testName, testDesc, camObj.getNumRecordings(), 0)  
+
+   # Test invalid recording modes
+   testDesc = "PiCamera start recording with duration < " + str(DinoCamera.MIN_DURATION) + "."
+   status = camObj.startRecording(duration=(DinoCamera.MIN_DURATION-1))
+   testEquals(testName, testDesc, status, False)  
+
+   testDesc = "PiCamera start recording with duration > " + str(DinoCamera.MAX_DURATION) + "."
+   status = camObj.startRecording(duration=(DinoCamera.MAX_DURATION+1))
+   testEquals(testName, testDesc, status, False)  
+
+   # Test single recording mode
+   print()
    testDesc = "PiCamera start recording."
-   status = camObj.startRecording()
+   startRecMET = DinoTime.getMET()
+   status = camObj.startRecording(duration=5)
    testEquals(testName, testDesc, status, True)   
-
+   
    testDesc = "PiCamera created file=[" + camObj.getFilename() + "]"
    status = os.path.exists(camObj.getFilename())
    testEquals(testName, testDesc, status, True)
@@ -99,47 +114,70 @@ def testDinoCamera():
    status = camObj.startRecording()
    testEquals(testName, testDesc, status, False)
 
-   sleep(5)
+   while(camObj.isRecording() == True):
+      sleep(0.1)
 
+   stopRecMET = DinoTime.getMET()
    testDesc = "PiCamera stop recording."
-   recTime = camObj.stopRecording()
+   camObj.stopRecording()
    testEquals(testName, testDesc, camObj.isRecording(), False)   
 
    testDesc = "Recorded for more than 5 sec."
-   testGreaterThan(testName, testDesc, recTime, 5.0)
+   testGreaterThan(testName, testDesc, (stopRecMET - startRecMET), 5.0)
 
-   durations = [5.0, 30.0, 60.0, 120.0, 180.0, 300.0]
-   for j in durations:
-      # Start and stop recordings every 5 seconds to baseline
-      # the overhead for creating/saving files. 
-      recStartStatus = []
-      recStartTime = []
-      recDuration  = []
-      recStopTime  = []
-      duration = j   
+   testDesc = "Check number of recordings on boot."
+   testEquals(testName, testDesc, camObj.getNumRecordings(), 1)  
 
-      # Capture 6 readings, but only 5 are used for the subsequent 
-      # analysis as we want to see the time it takes to start/stop 
-      # new recordings. 
-      for i in range(6):
-         recStartStatus.append(camObj.startRecording())
-         recStartTime.append(DinoTime.getMET())
-         sleep(duration)
-         recDuration.append(camObj.stopRecording())
-         recStopTime.append(DinoTime.getMET())
+   # Test single recording mode
+   print()
+   testDesc = "PiCamera start recording."
+   startRecMET = DinoTime.getMET()
+   status = camObj.startRecording(duration=60)
+   testEquals(testName, testDesc, status, True)   
    
-      # Check the results of the previous tests.
-      for i in range(5):
-         testDesc = "PiCamera started rec #" + str(i) + "."
-         testEquals(testName, testDesc, recStartStatus[i], True)
-         testDesc = "PiCamera stopped rec #" + str(i) + "."
-         testEquals(testName, testDesc, recDuration[i]>0, True)
-         testDesc = "PiCamera rec #" + str(i) + " duration. "
-         testInRange(testName, testDesc, recDuration[i], duration-0.01, duration+0.01)
-         testDesc = "Check time between recordings."
-         testLessThan(testName, testDesc, recStartTime[i+1]-recStopTime[i], 0.01)
+   testDesc = "Check PiCamera recording mode."
+   testEquals(testName, testDesc, camObj.isRecording(), True)   
+
+   sleep(1)
+
+   stopRecMET = DinoTime.getMET()
+   testDesc = "PiCamera stop recording."
+   camObj.stopRecording()
+   testEquals(testName, testDesc, camObj.isRecording(), False)   
+
+   testDesc = "Recorded for less than 5 sec."
+   testLessThan(testName, testDesc, (stopRecMET - startRecMET), 5.0)
+
+   testDesc = "Check number of recordings on boot."
+   testEquals(testName, testDesc, camObj.getNumRecordings(), 2) 
+
+   # Test continuous recording mode
+   print()
+   testDesc = "PiCamera start continuous recording."
+   startRecMET = DinoTime.getMET()   
+   status = camObj.startRecording(single=False, duration=DinoCamera.MIN_DURATION)
+   testEquals(testName, testDesc, status, True)   
+
+   testDesc = "Check PiCamera recording mode."
+   testEquals(testName, testDesc, camObj.isRecording(), True)   
+
+   sleep(DinoCamera.MIN_DURATION * 4)
+
+   testDesc = "Check PiCamera recording mode (after 5 * MIN_DURATION)."
+   testEquals(testName, testDesc, camObj.isRecording(), True)   
       
-      
+   stopRecMET = DinoTime.getMET()
+   testDesc = "PiCamera stop recording."
+   camObj.stopRecording()
+   testEquals(testName, testDesc, camObj.isRecording(), False)   
+
+   testDesc = "Recorded for more than 20 sec."
+   testGreaterThan(testName, testDesc, (stopRecMET - startRecMET), 20.0)
+
+   testDesc = "Check number of recordings since boot."
+   testEquals(testName, testDesc, camObj.getNumRecordings(), 6)  
+
+   
 
 def testDinoEnvirophat():
    # Test variables
