@@ -195,15 +195,14 @@ class DinoCamera(object):
          timestamp = DinoTime.getTimestampStr()
          filepath = self.__filename + "_" + timestamp + ".h264"         
 
-         # Updated shared variables
-         lockCount.acquire()
-         self.__count = self.__count + 1
-         lockCount.release()
          
          # Start new recording
          try:
             self.__camera.start_recording(filepath)
             DinoLog.logMsg("Start PiCamera file=[" + filepath + "]")
+            lockCount.acquire()
+            self.__count = self.__count + 1
+            lockCount.release()
          except:
             DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + filepath + "]")
             faultFound = True
