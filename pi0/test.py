@@ -172,7 +172,8 @@ def testDinoCamera():
    testDesc = "Check PiCamera recording mode."
    testEquals(testName, testDesc, camObj.isRecording(), True)   
 
-   sleep(DinoCamera.MIN_DURATION * 4)
+   if(status == True):
+      sleep(DinoCamera.MIN_DURATION * 4)
 
    testDesc = "Check PiCamera recording mode (after 5 * MIN_DURATION)."
    testEquals(testName, testDesc, camObj.isRecording(), True)   
