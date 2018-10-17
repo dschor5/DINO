@@ -7,13 +7,13 @@ from DinoTestUtils import *  # Test utilities
 
 printHeading("Start initialization (" + strftime("%Y%m%d-%H%M%S") + ")")
 
-from DinoTime         import *  # Time keeping (Real-time + MET)
-from DinoLog          import *  # Logging features
-from DinoCamera       import *  # PiCamera interface
-from DinoEnvirophat   import *  # Envirophat interface
-from DinoSerial       import *  # Serial data interface
-from DinoGpio         import *  # GPIO interface for servo, heater, and cooler
-from DinoSpectrometer import *  # Spectrometer interface
+from DinoTime           import *  # Time keeping (Real-time + MET)
+from DinoLog            import *  # Logging features
+from DinoCamera         import *  # PiCamera interface
+from DinoEnvirophat     import *  # Envirophat interface
+from DinoSerial         import *  # Serial data interface
+from DinoThermalControl import *  # GPIO interface for heater and cooler
+from DinoSpectrometer   import *  # Spectrometer interface
 
 printHeading("End initialization (" + strftime("%Y%m%d-%H%M%S") + ")")
 printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
@@ -253,11 +253,75 @@ def testDinoSerial():
    testDesc = ""
    print("No tests defined.")
    
-def testDinoGpio():
+def testDinoThermalControl():
    # Test variables
-   testName = "DinoGpio"
+   testName = "DinoThermalControl"
    testDesc = ""
-   print("No tests defined.")
+   
+   IDLE_TEMP = (TURN_OFF_HEATER + TURN_OFF_COOLER) / 2
+
+   printSubheading(testName, "Initialization")
+
+   testDesc = "Initialize class"      
+   thermal = DinoThermalControl(HEATER_PIN, COOLER_PIN)
+   testNotNone(testName, testDesc, thermal)
+
+   testDesc = "Test singleton"
+   obj2 = DinoThermalControl(HEATER_PIN, COOLER_PIN)
+   testEquals(testName, testDesc, obj2, thermal)
+
+   thermalState = thermal.run(IDLE_TEMP)
+   testDesc = "Temperature=" + '{0:.1f}'.format(IDLE_TEMP)
+   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
+   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+
+   printSubheading(testName, "Turn heater ON for 10 seconds")
+
+   thermalState = thermal.run(TURN_ON_HEATER - 1)
+   testDesc = "Temperature=" + '{0:.1f}'.format(TURN_ON_HEATER - 1)
+   testEquals(testName, testDesc + " heater is ON ",  thermalState[DinoThermalControl.STATE_HEATER], True)
+   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+
+   sleep(1)
+
+   thermalState = thermal.run(IDLE_TEMP)
+   testDesc = "Temperature=" + '{0:.1f}'.format(IDLE_TEMP)
+   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
+   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+
+   printSubheading(testName, "Turn cooler ON for 10 seconds")
+
+   thermalState = thermal.run(TURN_ON_COOLER + 1)
+   testDesc = "Temperature=" + '{0:.1f}'.format(TURN_ON_COOLER + 1)
+   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
+   testEquals(testName, testDesc + " cooler is ON ",  thermalState[DinoThermalControl.STATE_COOLER], True)
+
+   sleep(1)
+
+   thermalState = thermal.run(IDLE_TEMP)
+   testDesc = "Temperature=" + '{0:.1f}'.format(IDLE_TEMP)
+   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
+   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+  
+   printSubheading(testName, "Test thermal control logic")
+
+   for i in range(3):
+      currTemp  = round(TURN_ON_HEATER - 2)
+      while(currTemp < round(TURN_ON_COOLER + 2)):
+         currTemp = currTemp + 0.5
+         thermalState = thermal.run(currTemp)
+         print(testName + " - Temperature=" + '{0:.1f}'.format(currTemp) + " --> " + \
+            "HeaterOn=" + str(thermalState[DinoThermalControl.STATE_HEATER]) + ", " + \
+            "CoolerOn=" + str(thermalState[DinoThermalControl.STATE_COOLER]))
+
+      currTemp  = round(TURN_ON_COOLER + 2)
+      while(currTemp < round(TURN_ON_HEATER - 2)):
+         currTemp = currTemp - 0.5
+         thermalState = thermal.run(currTemp)
+         print(testName + " - Temperature=" + '{0:.1f}'.format(currTemp) + " --> " + \
+            "HeaterOn=" + str(thermalState[DinoThermalControl.STATE_HEATER]) + ", " + \
+            "CoolerOn=" + str(thermalState[DinoThermalControl.STATE_COOLER]))
+
    
 def testDinoSpectrometer():
    # Test variables
@@ -290,9 +354,9 @@ if((len(sys.argv) == 1) or ("DinoSerial" in sys.argv)):
    printHeading("Test DinoSerial class")
    testDinoSerial()
 
-if((len(sys.argv) == 1) or ("DinoGpio" in sys.argv)):
-   printHeading("Test DinoGpio class")
-   testDinoGpio()
+if((len(sys.argv) == 1) or ("DinoThermalControl" in sys.argv)):
+   printHeading("Test DinoThermalControl class")
+   testDinoThermalControl()
 
 if((len(sys.argv) == 1) or ("DinoSpectrometer" in sys.argv)):
    printHeading("Test DinoSpectrometer class")

@@ -6,15 +6,16 @@
 # Colors for printing output using ANSI escape sequences. 
 # From: http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
 COLORS = {
-   'TEST_PASS'  : '\033[92m',  # Green
-   'TEST_FAIL'  : '\033[91m',  # Red
-   'VALUE'      : '\033[93m',  # Yellow
-   'NORMAL'     : '\033[0m',   # White
-   'HEADING'    : '\033[95m',  # Magenta
+   'TEST_PASS'  : '\033[92m',   # Green
+   'TEST_FAIL'  : '\033[91m',   # Red
+   'VALUE'      : '\033[93m',   # Yellow
+   'NORMAL'     : '\033[0m',    # White
+   'HEADING'    : '\033[95m',   # Magenta
    'SUBHEADING' : '\u001b[36m', # Cyan
-   'DECOR'      : '\033[94m',  # Purple
-   'BOLD'       : '\033[1m'    # White/bold
+   'DECOR'      : '\033[94m',   # Purple
+   'BOLD'       : '\033[1m'     # White/bold
    }
+
 
 # Possible flight states sent by New Shepard vehicle to the payload.
 # From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
@@ -115,7 +116,7 @@ TURN_OFF_COOLER = 18.3 # Celsius. Equivalent to 65.0F.
 # From: Terry's email.
 SERVO_PIN  = 18
 HEATER_PIN = 16
-FAN_PIN    = 12
+COOLER_PIN = 12
 
 # Stop servo agitation when acceleration measured > 0.1g.
 # From: "HAB & DINOLAB Software Command Requirements.xlsx"
