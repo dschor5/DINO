@@ -97,16 +97,13 @@ def testDinoCamera():
    testEquals(testName, testDesc, status, False)  
 
    # Test single recording mode
-   print()
    testDesc = "PiCamera start recording."
    startRecMET = DinoTime.getMET()
    status = camObj.startRecording(duration=5)
    testEquals(testName, testDesc, status, True)   
    
-   testDesc = "PiCamera created file=[" + camObj.getFilename() + "]"
-   status = os.path.exists(camObj.getFilename())
-   testEquals(testName, testDesc, status, True)
-
+   sleep(1)
+   
    testDesc = "Check PiCamera recording mode."
    testEquals(testName, testDesc, camObj.isRecording(), True)   
 
@@ -115,7 +112,7 @@ def testDinoCamera():
    testEquals(testName, testDesc, status, False)
 
    while(camObj.isRecording() == True):
-      sleep(0.1)
+      sleep(1)
 
    stopRecMET = DinoTime.getMET()
    testDesc = "PiCamera stop recording."
@@ -129,7 +126,6 @@ def testDinoCamera():
    testEquals(testName, testDesc, camObj.getNumRecordings(), 1)  
 
    # Test single recording mode
-   print()
    testDesc = "PiCamera start recording."
    startRecMET = DinoTime.getMET()
    status = camObj.startRecording(duration=60)
@@ -152,7 +148,6 @@ def testDinoCamera():
    testEquals(testName, testDesc, camObj.getNumRecordings(), 2) 
 
    # Test continuous recording mode
-   print()
    testDesc = "PiCamera start continuous recording."
    startRecMET = DinoTime.getMET()   
    status = camObj.startRecording(single=False, duration=DinoCamera.MIN_DURATION)
