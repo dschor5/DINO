@@ -6,13 +6,14 @@
 # Colors for printing output using ANSI escape sequences. 
 # From: http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
 COLORS = {
-   'TEST_PASS' : '\033[92m',  # Green
-   'TEST_FAIL' : '\033[91m',  # Red
-   'VALUE'     : '\033[93m',  # Yellow
-   'NORMAL'    : '\033[0m',   # White
-   'HEADING'   : '\033[95m',  # Magenta
-   'DECOR'     : '\033[94m',  # Purple
-   'BOLD'      : '\033[1m'    # White/bold
+   'TEST_PASS'  : '\033[92m',  # Green
+   'TEST_FAIL'  : '\033[91m',  # Red
+   'VALUE'      : '\033[93m',  # Yellow
+   'NORMAL'     : '\033[0m',   # White
+   'HEADING'    : '\033[95m',  # Magenta
+   'SUBHEADING' : '\u001b[36m', # Cyan
+   'DECOR'      : '\033[94m',  # Purple
+   'BOLD'       : '\033[1m'    # White/bold
    }
 
 # Possible flight states sent by New Shepard vehicle to the payload.

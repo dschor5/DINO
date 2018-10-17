@@ -1,11 +1,25 @@
 from time import *
 from DinoConstants import *
 
+countPass = 0
+countFail = 0
 
 def printHeading(msg):
    global COLORS 
-   print(COLORS['HEADING'] + "*** " + str(msg) + COLORS['NORMAL'])
+   print("\n" + COLORS['HEADING'] + "*** " + str(msg) + COLORS['NORMAL'])
 
+def printSubheading(testName, msg):
+   global COLORS 
+   print(COLORS['SUBHEADING'] + "*** " + testName + " - " + str(msg) + COLORS['NORMAL'])
+
+def printResults():
+   global countPass
+   global countFail
+   total = countPass + countFail
+   percent = 0
+   if(total > 0):
+      percent = countPass / total * 100
+   print("Total " + formatValue(countPass) + " / " + formatValue(total) + " (" + formatValue(percent) + "%) tests passed.")
 
 def formatValue(value):
    valueStr = ""
@@ -24,9 +38,14 @@ def formatValue(value):
 
 def testResult(testName, testDesc, status):
    global COLORS
-   statusStr = COLORS['TEST_FAIL'] + "FAILED" + COLORS['NORMAL']
+   global countPass
+   global countFail
    if((status is not None) and (status == True)):
       statusStr = COLORS['TEST_PASS'] + "PASSED" + COLORS['NORMAL']
+      countPass = countPass + 1
+   else:
+      statusStr = COLORS['TEST_FAIL'] + "FAILED" + COLORS['NORMAL']
+      countFail = countFail + 1
    print(testName + " - " + statusStr + " - " + testDesc)
 
 
