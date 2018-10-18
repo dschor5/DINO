@@ -17,11 +17,11 @@ class DinoEnvirophat(object):
 
    The envirophat communicates with the pi0 using I2C to read 
    a the following sensors:
-      1) Light Sensor
-      2) Temperature Sensor
-      3) Pressure Sensor
-      4) Accelerometer
-      5) Magnetometer
+      1) Light Sensor       (TCS3472)
+      2) Temperature Sensor (BMP280)
+      3) Pressure Sensor    (BMP280)
+      4) Accelerometer      (LSM303D)
+      5) Magnetometer       (LSM303D)
 
    The API for the Envirophat had many additional functions that perform 
    some post-processing of the data received. However, some of those work 
