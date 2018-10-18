@@ -11,6 +11,8 @@ class DinoLog(object):
    Provides interface for logging messages at runtime. 
    The class abstracts some functionality to add timestamps 
    and unique identifiers to facilitate parsing the log.
+
+   #TODO - Update to support re-entrancy. 
    """
 
    # DinoLog Singleton instance 
@@ -33,7 +35,7 @@ class DinoLog(object):
 
    def __new__(cls, archiveName):
       """
-      Create and initialize DinoLog. 
+      Create a singleton instance and initialize the DinoLog. 
 
       Create a new folder of the archive with the name and a date/time timestamp.
       Log an initial entry indicating the file was created. 
