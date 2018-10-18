@@ -7,32 +7,73 @@ try:
    from envirophat import leds     # control leds on the board
    from envirophat import weather  # temperature and pressure sensors
    from envirophat import motion   # accelerometer sensor
-   leds.off()
 except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Envirophat not loaded.")
 
 
 class DinoEnvirophat(object):
+   """ 
+   Class DinoEnvirophat - Interface with EnviropHat.
 
+   The envirophat communicates with the pi0 using I2C to read 
+   a the following sensors:
+      1) Light Sensor
+      2) Temperature Sensor
+      3) Pressure Sensor
+      4) Accelerometer
+      5) Magnetometer
+
+   The API for the Envirophat had many additional functions that perform 
+   some post-processing of the data received. However, some of those work 
+   on cached data from the last reading instead of updating the reading 
+   and then performing the computation. Please review the details of the 
+   API if updating any of the functions called. 
+   """
+
+   # DinoEnvirophat Singleton instance 
    __instance = None
 
-   """ Singleton instance. """
+
    def __new__(cls):
+      """
+      Create a singleton instance of the DinoEnvirophat class. 
+      """
       if(DinoEnvirophat.__instance is None):
          DinoEnvirophat.__instance = object.__new__(cls)
+
+         # Turns LEDs on the board off so that they do not 
+         # interfere with the experiment.
+         leds.off()
       return DinoEnvirophat.__instance
 
-   """ Returns tuple with four values for R, G, B, and CLEAR values. """
+   
    def getLightSensorReadings(self):
-      data = (None, None, None, None)
+      """ 
+      Read raw light sensor readings from red, green, blue, and clear
+      channels and return them in a touple.
+      
+      Returns
+      -------
+      touple
+         Light reading for (red, green, blue, and clear) channels.       
+      """
       try:
          data = light.raw()
       except:
          DinoLog.logMsg("ERROR - Envirophat fail to read light sensor.")
+         data = (None, None, None, None)
       return data
             
-   """ Read temperature in degree C. """
+
    def getTemperature(self):
+      """ 
+      Read temperature in degree celsius. 
+      
+      Returns
+      -------
+      float
+         Temperature in degree Celsius.
+      """
       try:
          value = weather.temperature()
       except:
@@ -40,8 +81,16 @@ class DinoEnvirophat(object):
          value = None
       return value
    
-   """ Return pressure in Pa."""
+
    def getPressure(self):
+      """ 
+      Read pressure in Pa.
+      
+      Returns
+      -------
+      touple
+         Pressure reading in Pa.
+      """
       try:
          value = weather.pressure(unit='Pa')
       except:
@@ -49,8 +98,16 @@ class DinoEnvirophat(object):
          value = None
       return value
 
-   """ Returns tuple for acceleration x, y, and z. """
+
    def getAcceleration(self):
+      """ 
+      Read acceleration in UNITS??? for (x,y,z) axis.
+      
+      Returns
+      -------
+      touple
+         Acceleration touple (x,y,z) in UNITS???
+      """
       try:
          value = motion.accelerometer()
       except:
@@ -58,8 +115,16 @@ class DinoEnvirophat(object):
          value = (None, None, None)
       return value
    
-   """ Returns tuple for mag_x, mag_y, and mag_z readings."""
+
    def getMagReading(self):
+      """ 
+      Read magnetic field in UNITS??? for (x,y,z) axis.
+      
+      Returns
+      -------
+      touple
+         Magnetic field touple (x,y,z) in UNITS???
+      """
       try:
          value = motion.magnetometer()
       except:
