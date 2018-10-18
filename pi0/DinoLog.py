@@ -4,6 +4,8 @@ import sys
 
 from DinoTime import *
 
+#TODO - Update to support re-entrancy. 
+
 class DinoLog(object):
    """
    Class DinoLog - Logs data + errors at runtime.
@@ -11,8 +13,6 @@ class DinoLog(object):
    Provides interface for logging messages at runtime. 
    The class abstracts some functionality to add timestamps 
    and unique identifiers to facilitate parsing the log.
-
-   #TODO - Update to support re-entrancy. 
    """
 
    # DinoLog Singleton instance 
