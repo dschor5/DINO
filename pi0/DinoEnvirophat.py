@@ -77,7 +77,7 @@ class DinoEnvirophat(object):
       try:
          value = weather.temperature()
       except:
-         DinoLog.logMsg("ERROR - Envirophat read temperature.")
+         DinoLog.logMsg("ERROR - Envirophat fail to read temperature.")
          value = None
       return value
    
@@ -94,7 +94,7 @@ class DinoEnvirophat(object):
       try:
          value = weather.pressure(unit='Pa')
       except:
-         DinoLog.logMsg("ERROR - Envirophat read pressure.")
+         DinoLog.logMsg("ERROR - Envirophat fail to read pressure.")
          value = None
       return value
 
@@ -111,7 +111,7 @@ class DinoEnvirophat(object):
       try:
          value = motion.accelerometer()
       except:
-         DinoLog.logMsg("ERROR - Envirophat read acceleration.")
+         DinoLog.logMsg("ERROR - Envirophat fail to read acceleration.")
          value = (None, None, None)
       return value
    
@@ -128,7 +128,7 @@ class DinoEnvirophat(object):
       try:
          value = motion.magnetometer()
       except:
-         DinoLog.logMsg("ERROR - Envirophat read magnetometer.")
+         DinoLog.logMsg("ERROR - Envirophat fail to read magnetometer.")
          value = (None, None, None)
       return value
 
