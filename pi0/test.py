@@ -207,9 +207,11 @@ def testDinoEnvirophat():
    testEquals(testName, testDesc, obj2, env)
  
    # Run through a loop of tests. 
-   for i in range(1, 11):
+   numTests = 4
+   delayBetweenTests = 2.5
+   for i in range(1, numTests+1):
    
-      printSubheading(testName, "Test reading sensors " + str(i) + " of 10.")
+      printSubheading(testName, "Test reading sensors " + str(i) + " of " + str(numTests) + ".")
 
       value = env.getLightSensorReadings()
       testDesc = "Iteration #" + str(i) + " - Check light 'red' channel."
@@ -270,8 +272,8 @@ def testDinoThermalControl():
    obj2 = DinoThermalControl(HEATER_PIN, COOLER_PIN)
    testEquals(testName, testDesc, obj2, thermal)
 
-   thermalState = thermal.run(IDLE_TEMP)
-   testDesc = "Temperature=" + '{0:.1f}'.format(IDLE_TEMP)
+   thermalState = thermal.getState()
+   testDesc = "Default state for "
    testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
    testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
 

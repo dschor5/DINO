@@ -25,6 +25,7 @@ class DinoThermalControl(object):
          # Initialize heater control through GPIO pin. 
          try:
             DinoThermalControl.__heater = LED(heaterPin)
+            DinoThermalControl.__heater.off()
          except:
             DinoLog.logMsg("ERROR - Could not initialize GPIO for heater.")
             DinoThermalControl.__heater = None
@@ -32,10 +33,23 @@ class DinoThermalControl(object):
          # Initialize cooler control through GPIO pin.
          try:
             DinoThermalControl.__cooler = LED(coolerPin)
+            DinoThermalControl.__cooler.off()
          except:
             DinoLog.logMsg("ERROR - Could not initialize GPIO for cooler.")
             DinoThermalControl.__cooler = None
       return DinoThermalControl.__instance
+
+
+   def getState(self):
+      """
+      Get the state of the heater and cooler.
+      
+      Returns
+      -------
+      list
+         Heater state (on=True,off=False), Cooler state (on=True,off=False)
+      """
+      return self.__state
 
    
    def run(self, temperature=25):
@@ -47,28 +61,22 @@ class DinoThermalControl(object):
       temperature : float
          Current temperature in degree C.
          Default set such that heater and cooler are off.
+         
+      Returns
+      -------
+      list
+         Heater state (on=True,off=False), Cooler state (on=True,off=False)
       """
       if(temperature < TURN_ON_HEATER):
-         self.__setHeaterState(True)
-         self.__setCoolerState(False)
-         
-      elif(temperature > TURN_OFF_HEATER):
-         self.__setHeaterState(False)
+         self.__state[self.STATE_HEATER] = self.__setHeaterState(True)
+      else:
+         self.__state[self.STATE_HEATER] = self.__setHeaterState(False)
       
-      if(temperature < TURN_ON_COOLER):
-         self.__setCoolerState(True)
-         self.__setHeaterState(False)
-         
-      elif(temperature > TURN_OFF_COOLER):
-         self.__setCoolerState(False)
+      if(temperature > TURN_ON_COOLER):
+         self.__state[self.STATE_COOLER] = self.__setCoolerState(True)
+      else:
+         self.__state[self.STATE_COOLER] = self.__setCoolerState(False)
       
-      try:
-         self.__state[self.STATE_HEATER] = self.__heater.is_lit()
-         self.__state[self.STATE_COOLER] = self.__cooler.is_list()
-      except:
-         self.__state[self.STATE_HEATER] = False
-         self.__state[self.STATE_COOLER] = False
-
       return self.__state
 
    
@@ -87,8 +95,11 @@ class DinoThermalControl(object):
          True on success. False if error accessing GPIO.
       """
       try:
-         self.__heater.on()
-         status = self.__heater.is_list()
+         if(turnOn == True):
+            self.__heater.on()
+         else:
+            self.__heater.off()
+         status = self.__heater.is_lit
       except:
          DinoLog.logMsg("ERROR - Heater set(" + str(turnOn) + ") failed.")
          status = False
@@ -110,8 +121,11 @@ class DinoThermalControl(object):
          True on success. False if error accessing GPIO.
       """
       try:
-         self.__cooler.on()
-         status = self.__cooler.is_list()
+         if(turnOn == True):
+            self.__cooler.on()
+         else:
+            self.__cooler.off()
+         status = self.__cooler.is_lit
       except:
          
          DinoLog.logMsg("ERROR - Cooler set(" + str(turnOn) + ") failed.")

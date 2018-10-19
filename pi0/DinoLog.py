@@ -51,7 +51,7 @@ class DinoLog(object):
          # Generate filename for archive and create a new folder to store the data.
          timestamp = DinoTime.getTimestampStr()
          DinoLog.__folder = archiveName + "_" + timestamp
-         DinoLog.__filepath = self.__folder + "/" + archiveName + "_" + timestamp + ".txt"
+         DinoLog.__filepath = DinoLog.__folder + "/" + archiveName + "_" + timestamp + ".txt"
          if(not os.path.exists(os.path.dirname(DinoLog.__filepath))):
             os.mkdir(os.path.dirname(DinoLog.__filepath))
 
@@ -174,6 +174,7 @@ class DinoLog(object):
       """
       Destructor to ensure the log file is closed.
       """
+      self.logMsg("Log file \"" + DinoLog.__filepath + "\" closed.")
       self.closeLog()
 
 
