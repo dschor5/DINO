@@ -48,7 +48,8 @@ class DinoLog(object):
 
          # Generate filename for archive and create a new folder to store the data.
          timestamp = DinoTime.getTimestampStr()
-         DinoLog.__filepath = archiveName + "_" + timestamp + "/" + archiveName + "_" + timestamp + ".txt"
+         DinoLog.__folder = archiveName + "_" + timestamp
+         DinoLog.__filepath = self.__folder + "/" + archiveName + "_" + timestamp + ".txt"
          if(not os.path.exists(os.path.dirname(DinoLog.__filepath))):
             os.mkdir(os.path.dirname(DinoLog.__filepath))
 
@@ -62,6 +63,19 @@ class DinoLog(object):
          DinoLog.__dataId = 0         
       return DinoLog.__instance
    
+   
+   @staticmethod
+   def getFolder():
+      """
+      Returns teh folder for the current archive.
+      
+      Returns
+      -------
+      str
+         Folder name for current archive
+      """
+      return DinoLog.__folder
+
 
    def getFilename(self):
       """
