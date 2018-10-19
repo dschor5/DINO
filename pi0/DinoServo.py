@@ -169,7 +169,7 @@ class DinoServo(object):
          # Start new recording. If successful, increment the recording counter.
          try:
             #TODO add servo command
-            DinoLog.logMsg("Servo changed position")
+            DinoLog.logMsg("Servo moved!")
          except:
             DinoLog.logMsg("ERROR - Failed to move servo.")
             faultFound = True
@@ -181,7 +181,6 @@ class DinoServo(object):
          while((currDuration <= period) and (stopEvent.isSet() == False and (faultFound == False))):
             time.sleep(0.1)
             currDuration = DinoTime.getMET() - startTime
-
 
       # Clear protected flag to show thread has started
       lock.acquire()

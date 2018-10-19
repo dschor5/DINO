@@ -249,11 +249,6 @@ def testDinoEnvirophat():
       
       sleep(1)      
 
-def testDinoSerial():
-   # Test variables
-   testName = "DinoSerial"
-   testDesc = ""
-   print("No tests defined.")
    
 def testDinoThermalControl():
    # Test variables
@@ -324,6 +319,17 @@ def testDinoThermalControl():
             "HeaterOn=" + str(thermalState[DinoThermalControl.STATE_HEATER]) + ", " + \
             "CoolerOn=" + str(thermalState[DinoThermalControl.STATE_COOLER]))
 
+def testDinoServo():
+   # Test variables
+   testName = "DinoServo"
+   testDesc = ""
+   print("No tests defined.")
+
+def testDinoSerial():
+   # Test variables
+   testName = "DinoSerial"
+   testDesc = ""
+   print("No tests defined.")   
    
 def testDinoSpectrometer():
    # Test variables
@@ -334,7 +340,7 @@ def testDinoSpectrometer():
 
 # Initialize time system
 DinoTime()
-DinoLog("test")
+DinoLog("results")
 
 if((len(sys.argv) == 1) or ("DinoTime" in sys.argv)):
    printHeading("Test DinoTime class")
@@ -352,13 +358,17 @@ if((len(sys.argv) == 1) or ("DinoEnvirophat" in sys.argv)):
    printHeading("Test DinoEnvirophat class")
    testDinoEnvirophat()
 
-if((len(sys.argv) == 1) or ("DinoSerial" in sys.argv)):
-   printHeading("Test DinoSerial class")
-   testDinoSerial()
-
 if((len(sys.argv) == 1) or ("DinoThermalControl" in sys.argv)):
    printHeading("Test DinoThermalControl class")
    testDinoThermalControl()
+
+if((len(sys.argv) == 1) or ("DinoServo" in sys.argv)):
+   printHeading("Test DinoServo class")
+   testDinoServo()
+
+if((len(sys.argv) == 1) or ("DinoSerial" in sys.argv)):
+   printHeading("Test DinoSerial class")
+   testDinoSerial()
 
 if((len(sys.argv) == 1) or ("DinoSpectrometer" in sys.argv)):
    printHeading("Test DinoSpectrometer class")
