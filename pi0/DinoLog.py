@@ -4,6 +4,8 @@ import sys
 
 from DinoTime import *
 
+#TODO - Update to support re-entrancy. 
+
 class DinoLog(object):
    """
    Class DinoLog - Logs data + errors at runtime.
@@ -33,7 +35,7 @@ class DinoLog(object):
 
    def __new__(cls, archiveName):
       """
-      Create and initialize DinoLog. 
+      Create a singleton instance and initialize the DinoLog. 
 
       Create a new folder of the archive with the name and a date/time timestamp.
       Log an initial entry indicating the file was created. 
