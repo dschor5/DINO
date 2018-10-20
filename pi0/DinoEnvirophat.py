@@ -43,7 +43,10 @@ class DinoEnvirophat(object):
 
          # Turns LEDs on the board off so that they do not 
          # interfere with the experiment.
-         leds.off()
+         try:
+            leds.off()
+         except:
+            DinoLog.logMsg("ERROR - Envirophat fail to turn off on-board led.")
       return DinoEnvirophat.__instance
 
    
