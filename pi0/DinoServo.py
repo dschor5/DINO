@@ -37,7 +37,7 @@ class DinoServo(object):
          except:
             DinoLog.logMsg("ERROR - Could not create lock for servo thread.")
 
-         # Create event to notify recording thread when to stop.
+         # Create event to notify servo thread when to stop.
          # While this could have been done with a lock, the event 
          # has built in functions for checking if a flag is set.
          try:
