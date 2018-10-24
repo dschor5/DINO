@@ -238,7 +238,7 @@ class DinoCamera(object):
          recStartTime = DinoTime.getMET() 
          recTime = DinoTime.getMET() - recStartTime
          while((recTime <= self.__duration) and (stopEvent.isSet() == False and (faultFound == False))):
-            time.sleep(0.1)
+            time.sleep(1)
             recTime = DinoTime.getMET() - recStartTime
 
          # Stop the recording.
