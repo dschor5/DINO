@@ -51,6 +51,18 @@ def testDinoTime():
       met = DinoTime.getMET()
       testEquals(testName, testDesc, met-refMet, float(i), 0.01)
 
+   printSubheading(testName, "Test time jump.")
+   
+   testDesc = "Reject backwards time jump."
+   status = DinoTime.setTime(DinoTime.getMET() - 10.0)
+   testIsFalse(testName, testDesc, status)
+   
+   testDesc = "Jump time 10sec into the future."
+   refMet = DinoTime.getMET()
+   status = DinoTime.setTime(DinoTime.getMET() + 10.0)
+   newMet = DinoTime.getMET()
+   testEquals(testName, testDesc, newMet-refMet, 10.0, 0.01)
+
 
 def testDinoLog():
 
@@ -189,6 +201,7 @@ def testDinoCamera():
    testDesc = "Check number of recordings since boot."
    testEquals(testName, testDesc, camObj.getNumRecordings(), 6)  
 
+   
    
 
 def testDinoEnvirophat():
@@ -329,7 +342,21 @@ def testDinoSerial():
    # Test variables
    testName = "DinoSerial"
    testDesc = ""
-   print("No tests defined.")   
+ 
+   printSubheading(testName, "Initialization")
+
+   testDesc = "Initialize class"      
+   rPort = DinoSerial()
+   testNotNone(testName, testDesc, rPort)
+
+   testDesc = "Test singleton"
+   obj2 = DinoEnvirophat()
+   testEquals(testName, testDesc, obj2, rPort)   
+   
+   printSubheading(testName, "Fail to read sync byte.")
+   #TODO - Start loopback program that writes numbers
+      
+   
    
 def testDinoSpectrometer():
    # Test variables
