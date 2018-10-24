@@ -7,9 +7,9 @@ from DinoTime      import *
 from DinoLog       import *
 
 try:
-   from gpiozero   import PWMOutputDevice
+   from gpiozero   import Servo
 except:
-   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Servo PWM library not loaded.")
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Servo library not loaded.")
 
 
 class DinoServo(object):
@@ -26,7 +26,7 @@ class DinoServo(object):
       if(DinoServo.__instance is None):
          DinoServo.__instance = object.__new__(cls)
          DinoServo.__isAgitating = False
-         DinoServo.__single      = True
+         DinoServo.__servo       = None
          DinoServo.__thread      = None
          DinoServo.__lock        = None
          DinoServo.__stop        = None
@@ -49,8 +49,11 @@ class DinoServo(object):
          # Create PiCamera object.
          # Change configuration parameters as needed for the 
          try:
-            #TODO - Check parameters
-            DinoServo.__servo = PWMOutputDevice(servoPin, True, 0, 10)
+            DinoServo.__servo = Servo(servoPin, \
+               initial_value   = 0, \
+               min_pulse_width = 1/1000, \
+               max_pulse_width = 2/1000, \
+               frame_width     = 20/1000)
          except:
             DinoServo.__servo = None
             DinoLog.logMsg("ERROR - Could not create PWMOutputDevice() object.")
@@ -67,15 +70,12 @@ class DinoServo(object):
       return isAgitating
 
 
-   def startServo(self, single=True, period=4.0):
+   def startServo(self, period=4.0):
       """
       Start servo agitation on the requested period. 
 
       Parameters
       ----------
-      single : bool
-         If True, run a signel agitation immediately. 
-         If False, agitate every [period] seconds
       period : float
          Time in seconds between agitations.
       
@@ -98,12 +98,12 @@ class DinoServo(object):
       # Record settings and start thread
       self.__period  = float(period)
       self.__stop.set()
-      self.__single  = single
    
       # Start thread.
       try:
          self.__stop.clear()
-         self.__thread = Thread(target=self.__run, args=(self.__stop, self.__lock, period,)).start()
+         self.__thread = Thread(target=self.__run, args=(self.__stop, self.__lock, period,))
+         self.__thread.start()
          sleep(0.5)
          status = self.isAgitating()
       except:
@@ -161,26 +161,26 @@ class DinoServo(object):
       lock.release()
 
       # Run main loop for a single or continuous mode.
-      firstTime = True
       faultFound = False
-      while(((firstTime == True) or (self.__single == False)) and (stopEvent.isSet() == False) and (faultFound == False)):
-         firstTime = False
+      while((stopEvent.isSet() == False) and (faultFound == False)):
 
-         # Start new recording. If successful, increment the recording counter.
          try:
-            #TODO add servo command
-            DinoLog.logMsg("Servo moved.")
+            if(self.__servo.value is None):
+               DinoLog.logMsg("ERROR - Servo is uncontrolled.")
+               faultFound = True
+            elif(self.__servo.value > 0):
+               self.__servo.min()
+               DinoLog.logMsg("Servo moved to min position.")
+            else:
+               self.__servo.max()            
+               DinoLog.logMsg("Servo moved to max position.")
+               
          except:
             DinoLog.logMsg("ERROR - Failed to move servo.")
             faultFound = True
 
-         # Wait until it reaches the end of the recording or
-         # the application sends a request to stop the capture.
-         startTime = DinoTime.getMET() 
-         currDuration = DinoTime.getMET() - startTime
-         while((currDuration <= period) and (stopEvent.isSet() == False and (faultFound == False))):
-            time.sleep(1)
-            currDuration = DinoTime.getMET() - startTime
+         # Wait until it is time to agitate again.
+         time.sleep(period)
 
       # Clear protected flag to show thread has started
       lock.acquire()
