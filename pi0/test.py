@@ -57,6 +57,10 @@ def testDinoTime():
    status = DinoTime.setTime(DinoTime.getMET() - 10.0)
    testIsFalse(testName, testDesc, status)
    
+   testDesc = "Jump by 0sec < threshold for applying jump."
+   status = DinoTime.setTime(DinoTime.getMET())
+   testIsFalse(testName, testDesc, status)
+   
    testDesc = "Jump time 10sec into the future."
    refMet = DinoTime.getMET()
    status = DinoTime.setTime(DinoTime.getMET() + 10.0)

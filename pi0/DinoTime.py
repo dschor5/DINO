@@ -16,18 +16,18 @@ class DinoTime(object):
          initializes and can be used to measure the time elapsed 
          between events.  
 
-   #TODO - Consider adding function to sync time from serial data.
-
    This class was designed using static methods such that these methods
    can be called from any part of the application. 
    """
-
 
    # DinoTime Singleton instance 
    __instance = None
 
    # Reference timestamp for calculating MET.
    __startTime = 0
+
+   # Minimum time difference to cause the time sync.
+   SYNC_TIME_MIN_THRESHOLD = 0.1
 
 
    def __new__(cls):
@@ -49,6 +49,9 @@ class DinoTime(object):
       time to the main vehicle in the event of a reboot
       of the raspberry pi that cause the MET to be reset to 0.
       
+      Only change the time if the difference between the 
+      two clocks is greater than a certain threshold.
+      
       Assume that the system can only jump the time forward.
       If a backwards time jump is requested, return False.
             
@@ -60,17 +63,17 @@ class DinoTime(object):
       Return
       ------
       bool
-         True on success. False otherwise.
+         True if it changed the time, False otherwise.
       """
       currMet = DinoTime.getMET()
+      status = False
       
-      # Reject backwards time jumps.
-      if(currMet > newMet):
-         return False
-         
-      # Calculate new startTime reference.
-      DinoTime.__startTime = time.time() - newMet
-      return True
+      # Validate jump in forward direction and greater
+      # than some minimum threshold.
+      if((newMet - currMet) > DinoTime.SYNC_TIME_MIN_THRESHOLD):
+         DinoTime.__startTime = time.time() - newMet
+         status = True
+      return status
       
 
    @staticmethod
