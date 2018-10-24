@@ -12,12 +12,14 @@ class DinoSerial(object):
 
    __instance = None
    
+   """
    PORT_NAME = '/dev/ttyAMA0'
    BAUD_RATE = 115200
    PARITY    = serial.PARITY_NONE
    STOP_BITS = serial.STOPBITS_ONE
    BYTE_SIZE = serial.EIGHTBITS
    TIMEOUT   = 0.1 # 10 Hz packets 
+   """
    
    # Maximum number of bytes/characters before a sync byte. 
    # If this is observed, then we have a communication problem. 
@@ -125,4 +127,5 @@ class DinoSerial(object):
       
       
    def __readSerialThread():
+      pass
       
