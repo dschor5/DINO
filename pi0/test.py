@@ -11,6 +11,7 @@ from DinoTime           import *  # Time keeping (Real-time + MET)
 from DinoLog            import *  # Logging features
 from DinoCamera         import *  # PiCamera interface
 from DinoEnvirophat     import *  # Envirophat interface
+from DinoServo          import *  # Servo interface
 from DinoSerial         import *  # Serial data interface
 from DinoThermalControl import *  # GPIO interface for heater and cooler
 from DinoSpectrometer   import *  # Spectrometer interface
@@ -50,6 +51,22 @@ def testDinoTime():
       sleep(i)
       met = DinoTime.getMET()
       testEquals(testName, testDesc, met-refMet, float(i), 0.01)
+
+   printSubheading(testName, "Test time jump.")
+   
+   testDesc = "Reject backwards time jump."
+   status = DinoTime.setTime(DinoTime.getMET() - 10.0)
+   testIsFalse(testName, testDesc, status)
+   
+   testDesc = "Jump by 0sec < threshold for applying jump."
+   status = DinoTime.setTime(DinoTime.getMET())
+   testIsFalse(testName, testDesc, status)
+   
+   testDesc = "Jump time 10sec into the future."
+   refMet = DinoTime.getMET()
+   status = DinoTime.setTime(DinoTime.getMET() + 10.0)
+   newMet = DinoTime.getMET()
+   testEquals(testName, testDesc, newMet-refMet, 10.0, 0.01)
 
 
 def testDinoLog():
@@ -190,6 +207,7 @@ def testDinoCamera():
    testEquals(testName, testDesc, camObj.getNumRecordings(), 6)  
 
    
+   
 
 def testDinoEnvirophat():
    # Test variables
@@ -323,13 +341,78 @@ def testDinoServo():
    # Test variables
    testName = "DinoServo"
    testDesc = ""
-   print("No tests defined.")
+   
+   printSubheading(testName, "Initialization")
+
+   testDesc = "Initialize class"      
+   srv = DinoServo(SERVO_PIN)
+   testNotNone(testName, testDesc, srv)
+
+   testDesc = "Test singleton"
+   obj2 = DinoServo(SERVO_PIN)
+   testEquals(testName, testDesc, obj2, srv)   
+   
+   testDesc = "Check servo default agitating=OFF."
+   testEquals(testName, testDesc, srv.isAgitating(), False) 
+
+   printSubheading(testName, "Invalid agitating periods")
+   testDesc = "Agitate servo with period < " + str(DinoServo.MIN_PERIOD) + "."
+   status = srv.startServo(period=(DinoServo.MIN_PERIOD-1))
+   testEquals(testName, testDesc, status, False)  
+
+   testDesc = "Agitate servo with period > " + str(DinoServo.MAX_PERIOD) + "."
+   status = srv.startServo(period=(DinoServo.MAX_PERIOD+1))
+   testEquals(testName, testDesc, status, False)  
+
+   stopRecMET = DinoTime.getMET()
+   testDesc = "Stop servo when nothing is in progress."
+   status = srv.stopServo()
+   testEquals(testName, testDesc, status, False)   
+
+   printSubheading(testName, "Test servo operation")
+
+   testDesc = "Start servo with period = 4."
+   startRecMET = DinoTime.getMET()   
+   status = srv.startServo(period=4)
+   testEquals(testName, testDesc, status, True)   
+
+   testDesc = "Check servo is agitating."
+   testEquals(testName, testDesc, srv.isAgitating(), True)   
+
+   if(status == True):
+      sleep(DinoServo.MIN_PERIOD * 4)
+
+   testDesc = "Check servo is still agitating (after 3 * MIN_PERIOD)."
+   testEquals(testName, testDesc, srv.isAgitating(), True)   
+      
+   stopRecMET = DinoTime.getMET()
+   testDesc = "Stop servo."
+   status = srv.stopServo()
+   testEquals(testName, testDesc, status, False)   
+
+   testDesc = "Check servo is not agitating."
+   testEquals(testName, testDesc, srv.isAgitating(), True)  
+
 
 def testDinoSerial():
    # Test variables
    testName = "DinoSerial"
    testDesc = ""
-   print("No tests defined.")   
+ 
+   printSubheading(testName, "Initialization")
+
+   testDesc = "Initialize class"      
+   rPort = DinoSerial()
+   testNotNone(testName, testDesc, rPort)
+
+   testDesc = "Test singleton"
+   obj2 = DinoEnvirophat()
+   testEquals(testName, testDesc, obj2, rPort)   
+   
+   printSubheading(testName, "Fail to read sync byte.")
+   #TODO - Start loopback program that writes numbers
+      
+   
    
 def testDinoSpectrometer():
    # Test variables
