@@ -129,12 +129,12 @@ class DinoCamera(object):
       """
       # Ensure there is no recording in progress.
       if(self.isRecording() == True):
-         DinoLog.logMsg("ERROR - PiCamera recording already in progress.")
+         DinoLog.logMsg("ERROR - PiCamera recording already in progress.", True)
          return False
       
       # Validate input parameters
       if((duration < self.MIN_DURATION) or (duration > self.MAX_DURATION)):
-         DinoLog.logMsg("ERROR - Invalid PiCamera recording duration=[" + str(duration) + "].")
+         DinoLog.logMsg("ERROR - Invalid PiCamera recording duration=[" + str(duration) + "].", True)
          return False
 
       # Record settings and start thread

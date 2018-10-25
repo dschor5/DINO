@@ -33,23 +33,29 @@ class DinoLog(object):
    MET_STR_FORMAT = "0>8.2f"
 
 
-   def __new__(cls, archiveName):
+   def __new__(cls, archiveName, debugEnable=False):
       """
       Create a singleton instance and initialize the DinoLog. 
 
       Create a new folder of the archive with the name and a date/time timestamp.
       Log an initial entry indicating the file was created. 
 
+      If debug is enabled, subsequent calls to logMsg() with debug=True will
+      be recorded in the log. Otherwise, those messages will not be saved.
+
       Parameters
       ----------
       archiveName : str
-         Name for log archive.  
+         Name for log archive.
+      debugEnable : bool
+         Enable logging of debug messages.  
       """
       if(DinoLog.__instance is None):
          DinoLog.__instance = object.__new__(cls)
 
          # Generate filename for archive and create a new folder to store the data.
          timestamp = DinoTime.getTimestampStr()
+         DinoLog.__debugEnable = debugEnable
          DinoLog.__folder = archiveName + "_" + timestamp
          DinoLog.__filepath = DinoLog.__folder + "/" + archiveName + "_" + timestamp + ".txt"
          if(not os.path.exists(os.path.dirname(DinoLog.__filepath))):
@@ -92,12 +98,16 @@ class DinoLog(object):
 
 
    @staticmethod
-   def logMsg(msg):
+   def logMsg(msg, debugMsg=False):
       """
       Log status/warning/error messages from application. 
       
       This is a static method such that it can be called from any of 
       the classes without needing to first get an instance of the class.
+
+      If the debugMsg flag is set, then the messages will only 
+      be recorded if debug was enabled at initialization. Otherwise,
+      the message will be skipped completely.
 
       The same log file is used to capture both messages and data. 
       Each of the two types has a unique counter to track how many 
@@ -112,12 +122,15 @@ class DinoLog(object):
       Parameter
       ---------
       data : str
-         String to print to the file.       
+         String to print to the file.  
+      debugMsg : bool
+         Flag to log      
       """
-      DinoLog.__msgId = DinoLog.__msgId + 1
-      DinoLog.__log(DinoLog.__instance, \
-         DinoLog.EVENT_ID + str(DinoLog.__msgId) + DinoLog.CSV_SEP + \
-         msg.replace(DinoLog.CSV_SEP, DinoLog.SAFE_SEP))   
+      if((DinoLog.__debugEnable == True) and (debugMsg == True)):
+         DinoLog.__msgId = DinoLog.__msgId + 1
+         DinoLog.__log(DinoLog.__instance, \
+            DinoLog.EVENT_ID + str(DinoLog.__msgId) + DinoLog.CSV_SEP + \
+            msg.replace(DinoLog.CSV_SEP, DinoLog.SAFE_SEP))   
 
 
    def logData(self, data):
