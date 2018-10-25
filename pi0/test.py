@@ -424,7 +424,7 @@ def testDinoSpectrometer():
 
 # Initialize time system
 DinoTime()
-DinoLog("results")
+DinoLog("test", debugEnable=True)
 
 if((len(sys.argv) == 1) or ("DinoTime" in sys.argv)):
    printHeading("Test DinoTime class")
