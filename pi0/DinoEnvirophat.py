@@ -50,6 +50,38 @@ class DinoEnvirophat(object):
       return DinoEnvirophat.__instance
 
    
+   def readData(self):
+      """
+      Read all sensors in the envirophat and return them in a touple.
+
+         Index | Abbreviation | Description
+         ------------------------------------------------------
+          0    | LR           | Light red channel
+          1    | LG           | Light green channel
+          2    | LB           | Light blue channel
+          3    | LC           | Light clear channel
+          4    | T            | Temperature (C)
+          5    | P            | Pressure (Pa)
+          6    | AX           | Acceleration along x-axis
+          7    | AY           | Acceleration along y-axis
+          8    | AZ           | Acceleration along z-axis
+          9    | MX           | Magnetometer reading along x-axis
+         10    | MX           | Magnetometer reading along x-axis
+         11    | MX           | Magnetometer reading along x-axis
+
+      Returns
+      -------
+      touple
+         (LR, LG, LB, LC, T, P, AX, AY, AZ, MX, MY, MZ) 
+      """
+      data = ()
+      data = data + self.getLightSensorReadings()
+      data = data + self.getTemperature()
+      data = data + self.getPressure()
+      data = data + self.getAcceleration()
+      data = data + self.getMagReading()
+      return data
+   
    def getLightSensorReadings(self):
       """ 
       Read raw light sensor readings from red, green, blue, and clear
@@ -78,12 +110,11 @@ class DinoEnvirophat(object):
          Temperature in degree Celsius.
       """
       try:
-         value = weather.temperature()
+         value = (weather.temperature(),)
       except:
          DinoLog.logMsg("ERROR - Envirophat fail to read temperature.")
-         value = None
-      return value
-   
+         value = (None,)
+      return value   
 
    def getPressure(self):
       """ 
@@ -95,10 +126,10 @@ class DinoEnvirophat(object):
          Pressure reading in Pa.
       """
       try:
-         value = weather.pressure(unit='Pa')
+         value = (weather.pressure(unit='Pa'),)
       except:
          DinoLog.logMsg("ERROR - Envirophat fail to read pressure.")
-         value = None
+         value = (None,)
       return value
 
 

@@ -243,11 +243,11 @@ def testDinoEnvirophat():
       
       value = env.getTemperature()
       testDesc = "Iteration #" + str(i) + " - Check temperature."
-      testNotNone(testName, testDesc, value)      
+      testNotNone(testName, testDesc, value[0])      
       
       value = env.getPressure()
       testDesc = "Iteration #" + str(i) + " - Check pressure."
-      testNotNone(testName, testDesc, value)
+      testNotNone(testName, testDesc, value[0])
       
       value = env.getAcceleration()
       testDesc = "Iteration #" + str(i) + " - Check acceleration x channel."
