@@ -341,6 +341,7 @@ def testDinoServo():
    # Test variables
    testName = "DinoServo"
    testDesc = ""
+   period = 4
    
    printSubheading(testName, "Initialization")
 
@@ -371,18 +372,18 @@ def testDinoServo():
 
    printSubheading(testName, "Test servo operation")
 
-   testDesc = "Start servo with period = 4."
+   testDesc = "Start servo with period = " + str(period) + "."
    startRecMET = DinoTime.getMET()   
-   status = srv.startServo(period=4)
+   status = srv.startServo(period)
    testEquals(testName, testDesc, status, True)   
 
    testDesc = "Check servo is agitating."
    testEquals(testName, testDesc, srv.isAgitating(), True)   
 
    if(status == True):
-      sleep(DinoServo.MIN_PERIOD * 4)
+      sleep(period * 3)
 
-   testDesc = "Check servo is still agitating (after 3 * MIN_PERIOD)."
+   testDesc = "Check servo is still agitating (after 3 * period)."
    testEquals(testName, testDesc, srv.isAgitating(), True)   
       
    stopRecMET = DinoTime.getMET()
@@ -391,7 +392,7 @@ def testDinoServo():
    testEquals(testName, testDesc, status, False)   
 
    testDesc = "Check servo is not agitating."
-   testEquals(testName, testDesc, srv.isAgitating(), True)  
+   testEquals(testName, testDesc, srv.isAgitating(), False)  
 
 
 def testDinoSerial():

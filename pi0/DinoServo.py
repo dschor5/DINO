@@ -104,8 +104,7 @@ class DinoServo(object):
          self.__stop.clear()
          self.__thread = Thread(target=self.__run, args=(self.__stop, self.__lock, period,))
          self.__thread.start()
-         sleep(0.5)
-         status = self.isAgitating()
+         status = (self.__thread is not None)
       except:
          DinoLog.logMsg("ERROR - Could not start servo agitation thread.")
          status = False
