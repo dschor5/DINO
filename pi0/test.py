@@ -402,11 +402,11 @@ def testDinoSerial():
    printSubheading(testName, "Initialization")
 
    testDesc = "Initialize class"      
-   rPort = DinoSerial()
+   rPort = DinoSerial('/dev/ttyAMA0')
    testNotNone(testName, testDesc, rPort)
 
    testDesc = "Test singleton"
-   obj2 = DinoEnvirophat()
+   obj2 = DinoSerial('/dev/ttyAMA0')
    testEquals(testName, testDesc, obj2, rPort)   
    
    printSubheading(testName, "Fail to read sync byte.")
