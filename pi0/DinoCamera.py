@@ -233,8 +233,9 @@ class DinoCamera(object):
             DinoLog.logMsg("ERROR - Failed to start PiCamera file=[" + filepath + "]")
             faultFound = True
 
-         # Wait until it reaches the end of the recording or
-         # the application sends a request to stop the capture.
+         # Wait until it reaches the end of the recording or the application sends a request to stop the capture.
+         # Note that we do not want to sleep for the entire duration becasue that doesn't allow us to stop/save 
+         # the file early if needed. 
          recStartTime = DinoTime.getMET() 
          recTime = DinoTime.getMET() - recStartTime
          while((recTime <= self.__duration) and (stopEvent.isSet() == False and (faultFound == False))):
