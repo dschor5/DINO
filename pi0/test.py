@@ -422,41 +422,42 @@ def testDinoSpectrometer():
    print("No tests defined.")
 
 
-# Initialize time system
-DinoTime()
-DinoLog("test", debugEnable=True)
+if(__name__ == "__main__"):
+   # Initialize time system
+   DinoTime()
+   DinoLog("test", debugEnable=True)
 
-if((len(sys.argv) == 1) or ("DinoTime" in sys.argv)):
-   printHeading("Test DinoTime class")
-   testDinoTime()
+   if((len(sys.argv) == 1) or ("DinoTime" in sys.argv)):
+      printHeading("Test DinoTime class")
+      testDinoTime()
 
-if((len(sys.argv) == 1) or ("DinoLog" in sys.argv)):
-   printHeading("Test DinoLog class")
-   testDinoLog()
-   
-if((len(sys.argv) == 1) or ("DinoCamera" in sys.argv)):
-   printHeading("Test DinoCamera class")
-   testDinoCamera()
-   
-if((len(sys.argv) == 1) or ("DinoEnvirophat" in sys.argv)):
-   printHeading("Test DinoEnvirophat class")
-   testDinoEnvirophat()
+   if((len(sys.argv) == 1) or ("DinoLog" in sys.argv)):
+      printHeading("Test DinoLog class")
+      testDinoLog()
+      
+   if((len(sys.argv) == 1) or ("DinoCamera" in sys.argv)):
+      printHeading("Test DinoCamera class")
+      testDinoCamera()
+      
+   if((len(sys.argv) == 1) or ("DinoEnvirophat" in sys.argv)):
+      printHeading("Test DinoEnvirophat class")
+      testDinoEnvirophat()
 
-if((len(sys.argv) == 1) or ("DinoThermalControl" in sys.argv)):
-   printHeading("Test DinoThermalControl class")
-   testDinoThermalControl()
+   if((len(sys.argv) == 1) or ("DinoThermalControl" in sys.argv)):
+      printHeading("Test DinoThermalControl class")
+      testDinoThermalControl()
 
-if((len(sys.argv) == 1) or ("DinoServo" in sys.argv)):
-   printHeading("Test DinoServo class")
-   testDinoServo()
+   if((len(sys.argv) == 1) or ("DinoServo" in sys.argv)):
+      printHeading("Test DinoServo class")
+      testDinoServo()
 
-if((len(sys.argv) == 1) or ("DinoSerial" in sys.argv)):
-   printHeading("Test DinoSerial class")
-   testDinoSerial()
+   if((len(sys.argv) == 1) or ("DinoSerial" in sys.argv)):
+      printHeading("Test DinoSerial class")
+      testDinoSerial()
 
-if((len(sys.argv) == 1) or ("DinoSpectrometer" in sys.argv)):
-   printHeading("Test DinoSpectrometer class")
-   testDinoSpectrometer()
+   if((len(sys.argv) == 1) or ("DinoSpectrometer" in sys.argv)):
+      printHeading("Test DinoSpectrometer class")
+      testDinoSpectrometer()
 
-printHeading("End test (" + strftime("%Y%m%d-%H%M%S") + ")")
-printResults()
+   printHeading("End test (" + strftime("%Y%m%d-%H%M%S") + ")")
+   printResults()
