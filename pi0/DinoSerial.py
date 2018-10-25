@@ -90,6 +90,11 @@ class DinoSerial(object):
          self.__serialPort = None
          DinoLog.logMsg("ERROR - Could not open serial port.")
       
+   def readData(self):
+      return (None, None, None, None, None, None, None, None, None, None, 
+              None, None, None, None, None, None, None, None, None, None, 
+              None)
+
       
    def __closeSerialPort(self):
       pass
