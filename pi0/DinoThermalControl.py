@@ -13,8 +13,10 @@ class DinoThermalControl(object):
    # DinoThermalControl Singleton instance 
    __instance = None
 
+   # Indeces into __state array to store whether the units are on/off.
    STATE_HEATER = 0
    STATE_COOLER = 1
+
 
    """ Singleton instance. """
    def __new__(cls, heaterPin, coolerPin):

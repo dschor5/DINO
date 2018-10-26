@@ -56,7 +56,8 @@ class DinoMain(object):
       Store a touple of sensor readings with "False" 
       for any fields that could not be read.
       """
-      self.__data = self.__dinoSerial.readData() + self.__dinoEnv.readData()
+      print(self.__dinoSerial.readData())
+      #self.__data = self.__dinoSerial.readData() + self.__dinoEnv.readData()
 
 
    def __determineState(self):
@@ -87,6 +88,8 @@ class DinoMain(object):
       This function serves as a wrapper for the DinoThermalControl.run()
       so that is can incorporate trending information if needed.
       """
+      
+
       self.__dinoThermal.run()
 
 
@@ -101,6 +104,7 @@ class DinoMain(object):
 
          # Read all sensor data and serial data
          self.__readAllData()
+         DinoLog.logdata(self.__data)
 
          # Determine experiment state
          self.__determineState()
@@ -125,6 +129,9 @@ class DinoMain(object):
          # Sleep for 0.05sec. By the time it wakes up, 
          # there should be serial data readily available.
          sleep(0.05)
+         
+         #TODO 
+         self.__endTest = True
 
 
 if(__name__ == "__main__"):

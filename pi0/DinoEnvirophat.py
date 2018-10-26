@@ -34,12 +34,29 @@ class DinoEnvirophat(object):
    __instance = None
 
 
+   ENV_KEYS = {
+      "LIGHT_RED"      : 0,
+      "LIGHT_GREEN"    : 1,
+      "LIGHT_BLUE"     : 2,
+      "LIGHT_CLEAR"    : 3,
+      "TEMPERATURE"    : 4,
+      "PRESSURE"       : 5,
+      "ACCELERATION_X" : 6,
+      "ACCELERATION_Y" : 7,
+      "ACCELERATION_Z" : 8,
+      "MAG_X"          : 9,
+      "MAG_Y"          : 10,
+      "MAG_Z           : 11
+   }
+
+
    def __new__(cls):
       """
       Create a singleton instance of the DinoEnvirophat class. 
       """
       if(DinoEnvirophat.__instance is None):
          DinoEnvirophat.__instance = object.__new__(cls)
+         DinoEnvirophat.__data = dict.fromkeys(ENV_KEYS)
 
          # Turns LEDs on the board off so that they do not 
          # interfere with the experiment.
@@ -93,11 +110,15 @@ class DinoEnvirophat(object):
          Light reading for (red, green, blue, and clear) channels.       
       """
       try:
-         data = light.raw()
+         temp = light.raw()
       except:
          DinoLog.logMsg("ERROR - Envirophat fail to read light sensor.")
-         data = (None, None, None, None)
-      return data
+         temp = (None, None, None, None)
+      self.__data["LIGHT_RED"]   = temp[0]
+      self.__data["LIGHT_GREEN"] = temp[1]
+      self.__data["LIGHT_BLUE"]  = temp[2]
+      self.__data["LIGHT_CLEAR"] = temp[3]
+      return self.__data
             
 
    def getTemperature(self):

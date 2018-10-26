@@ -12,6 +12,61 @@ class DinoSerial(object):
 
    __instance = None
    
+
+   # Field names within the New Shepard packet received at 10Hz.
+   # From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
+
+   # Current flight state as a single ASCII char. 
+   # States defined in FLIGHT_STATES enum above.
+   I_FLIGHT_STATE = 0  
+   
+   # Current experiment time in seconds as decimal 
+   # number with 2 digits following the decimal point.
+   I_EXP_TIME = 1
+
+   # Current vehicle altitude above ground level in feet as a 
+   # decimal number with 6 digits following the decimal point.
+   I_ALTITUDE = 2         
+
+   # Current vehicle velocity in feet per second along the three 
+   # axis of the capsule as a decimal number with 6 digits following
+   # the decimal point.
+   I_VELOCITY_X = 3           
+   I_VELOCITY_Y = 4
+   I_VELOCITY_Z = 5
+
+   # Magnitude of the current vehicle acceleration in feet per 
+   # second squared as a decimal number with 6 digits 
+   # following the decimal point.
+   I_ACCELERATION = 6
+
+   # Reserved for future use. Expect "0.000000".
+   I_RESERVED_1 = 7
+   I_RESERVED_2 = 8
+
+   # The current vehicle attitude in radians about the three axis 
+   # as a decimal number with 6 digits following the decimal point.
+   I_ATTITUDE_X = 9
+   I_ATTITUDE_Y = 10
+   I_ATTITUDE_Z = 11
+   
+   # Current vehicle angular velocity in radians per second
+   # about the three axis as a decimal number with 6 digits following 
+   # the decimal point.
+   I_ANG_VEL_X = 12
+   I_ANG_VEL_Y = 13
+   I_ANG_VEL_Z = 14
+
+   # Warnings triggered for different phases of the flight. 
+   # Suingle digit value set to 1 when the warning is TRUE and 0 when FALSE.
+   I_WARNING_LIFTOFF = 15  # Triggered on main engine ignition
+   I_WARNING_RCS     = 16  # Triggered during microgravity phase of flight to notify
+   I_WARNING_ESCAPE  = 17  # Triggered during the escape motor ignition process
+   I_WARNING_CHUTE   = 18  # Triggered shortly before drogue chute deployments
+   I_WARNING_LANDING = 19  # Triggered by altitude shortly before the capsule touches down
+   I_WARNING_FAULT   = 20  # Triggered in anticipation of an abnormally hard landing
+
+
    """
    PORT_NAME = '/dev/ttyAMA0'
    BAUD_RATE = 115200
@@ -91,9 +146,9 @@ class DinoSerial(object):
          DinoLog.logMsg("ERROR - Could not open serial port.")
       
    def readData(self):
-      return (None, None, None, None, None, None, None, None, None, None, 
-              None, None, None, None, None, None, None, None, None, None, 
-              None)
+            
+
+      return temp
 
       
    def __closeSerialPort(self):
