@@ -8,63 +8,72 @@ except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Serial interface not loaded.")
 
 
+# Possible flight states sent by New Shepard vehicle to the payload.
+# From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
+NR_STATE_NONE        = '@' # No flight state has been reached yet 
+                           #    (typically the time prior to liftoff).
+NR_STATE_LIFTOFF     = 'A' # This state is triggered once sensed acceleration 
+                           #    first changes due to engine ignition.
+NR_STATE_MECO        = 'B' # This state is triggered after the rocket's main engine 
+                           #    cuts out, and the flight enters its coast stage.
+NR_STATE_SEPARATION  = 'C' # This state occurs after the rocket and capsule 
+                           #    separate, shortly before the microgravity 
+                           #    portion of the flight begins.
+NR_STATE_COAST_START = 'D' # This state indicates the beginning of the cleanest 
+                           #    microgravity operations onboard the capsule, 
+                           #    most experiments should begin logging data at this time.
+NR_STATE_APOGEE      = 'E' # This state occurs when the vehicle has reached its 
+                           #    maximum altitude and begins to descend.
+NR_STATE_COAST_END   = 'F' # This state indicates the end of microgravity operations 
+                           #    onboard the capsule, as we begin to experience 
+                           #    atmospheric accelerations. Many experiments will 
+                           #    cease logging data at this time.
+NR_STATE_UNDER_CHUTE = 'G' # This state indicates that drogue parachutes have 
+                           #    deployed and the capsule is in its final descent.
+NR_STATE_LANDING     = 'H' # This state occurs after capsule touchdown.
+NR_STATE_SAFING      = 'I' # After touchdown, this state indicates that the 
+                           #    capsule is venting and safing all energetic systems.
+NR_STATE_FINISHED    = 'J' # This state is only ever reached in simulation and 
+                           #    indicates the end of the logged flight data.
+
+
+# Field names within the New Shepard packet received at 10Hz.
+# From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
+NR_FLIGHT_STATE    = 0     # Current flight state as a single ASCII char. 
+                           # States defined in NR_STATE_* enum above.
+NR_EXP_TIME        = 1     # Current experiment time in seconds as decimal 
+                           # number with 2 digits following the decimal point.
+NR_ALTITUDE        = 2     # Current vehicle altitude above ground level in feet as a 
+                           # decimal number with 6 digits following the decimal point.
+NR_VELOCITY_X      = 3     # Current vehicle velocity in feet per second along the three          
+NR_VELOCITY_Y      = 4     # axis of the capsule as a decimal number with 6 digits following
+NR_VELOCITY_Z      = 5     # the decimal point.
+NR_ACCELERATION    = 6     # Magnitude of the current vehicle acceleration in feet per  
+                           # second squared as a decimal number with 6 digits 
+                           # following the decimal point.
+NR_RESERVED_1      = 7     # Reserved for future use. Expect "0.000000".
+NR_RESERVED_2      = 8 
+NR_ATTITUDE_X      = 9     # The current vehicle attitude in radians about the three axis 
+NR_ATTITUDE_Y      = 10    # as a decimal number with 6 digits following the decimal point.
+NR_ATTITUDE_Z      = 11  
+NR_ANG_VEL_X       = 12    # Current vehicle angular velocity in radians per second
+NR_ANG_VEL_Y       = 13    # about the three axis as a decimal number with 6 digits following
+NR_ANG_VEL_Z       = 14    # the decimal point.   
+# Warnings triggered for different phases of the flight. 
+# Single digit value set to 1 when the warning is TRUE and 0 when FALSE.
+NR_WARNING_LIFTOFF = 15    # Triggered on main engine ignition
+NR_WARNING_RCS     = 16    # Triggered during microgravity phase of flight to notify
+NR_WARNING_ESCAPE  = 17    # Triggered during the escape motor ignition process
+NR_WARNING_CHUTE   = 18    # Triggered shortly before drogue chute deployments
+NR_WARNING_LANDING = 19    # Triggered by altitude shortly before the capsule touches down
+NR_WARNING_FAULT   = 20    # Triggered in anticipation of an abnormally hard landing
+NR_SIZE            = 21  
+
 class DinoSerial(object):
 
    __instance = None
    
 
-   # Field names within the New Shepard packet received at 10Hz.
-   # From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
-
-   # Current flight state as a single ASCII char. 
-   # States defined in FLIGHT_STATES enum above.
-   I_FLIGHT_STATE = 0  
-   
-   # Current experiment time in seconds as decimal 
-   # number with 2 digits following the decimal point.
-   I_EXP_TIME = 1
-
-   # Current vehicle altitude above ground level in feet as a 
-   # decimal number with 6 digits following the decimal point.
-   I_ALTITUDE = 2         
-
-   # Current vehicle velocity in feet per second along the three 
-   # axis of the capsule as a decimal number with 6 digits following
-   # the decimal point.
-   I_VELOCITY_X = 3           
-   I_VELOCITY_Y = 4
-   I_VELOCITY_Z = 5
-
-   # Magnitude of the current vehicle acceleration in feet per 
-   # second squared as a decimal number with 6 digits 
-   # following the decimal point.
-   I_ACCELERATION = 6
-
-   # Reserved for future use. Expect "0.000000".
-   I_RESERVED_1 = 7
-   I_RESERVED_2 = 8
-
-   # The current vehicle attitude in radians about the three axis 
-   # as a decimal number with 6 digits following the decimal point.
-   I_ATTITUDE_X = 9
-   I_ATTITUDE_Y = 10
-   I_ATTITUDE_Z = 11
-   
-   # Current vehicle angular velocity in radians per second
-   # about the three axis as a decimal number with 6 digits following 
-   # the decimal point.
-   I_ANG_VEL_X = 12
-   I_ANG_VEL_Y = 13
-   I_ANG_VEL_Z = 14
-
-   # Warnings triggered for different phases of the flight. 
-   # Suingle digit value set to 1 when the warning is TRUE and 0 when FALSE.
-   I_WARNING_LIFTOFF = 15  # Triggered on main engine ignition
-   I_WARNING_RCS     = 16  # Triggered during microgravity phase of flight to notify
-   I_WARNING_ESCAPE  = 17  # Triggered during the escape motor ignition process
-   I_WARNING_CHUTE   = 18  # Triggered shortly before drogue chute deployments
-   I_WARNING_LANDING = 19  # Triggered by altitude shortly before the capsule touches down
-   I_WARNING_FAULT   = 20  # Triggered in anticipation of an abnormally hard landing
 
 
    """
@@ -86,6 +95,7 @@ class DinoSerial(object):
       if(DinoSerial.__instance is None):
          DinoSerial.__instance = object.__new__(cls)
          DinoSerial.__serialPort = None
+         DinoSerial.__data = [None] * NR_SIZE
 
          # Create lock object to protect shared resources.
          try:
@@ -146,9 +156,28 @@ class DinoSerial(object):
          DinoLog.logMsg("ERROR - Could not open serial port.")
       
    def readData(self):
-            
-
-      return temp
+      self.__data[NR_FLIGHT_STATE]    = 0 #"@"
+      self.__data[NR_EXP_TIME]        = DinoTime.getMET()
+      self.__data[NR_ALTITUDE]        = 0.0
+      self.__data[NR_VELOCITY_X]      = 0.0      
+      self.__data[NR_VELOCITY_Y]      = 0.0     
+      self.__data[NR_VELOCITY_Z]      = 0.0      
+      self.__data[NR_ACCELERATION]    = 0.0      
+      self.__data[NR_RESERVED_1]      = 0.0      
+      self.__data[NR_RESERVED_2]      = 0.0     
+      self.__data[NR_ATTITUDE_X]      = 0.0     
+      self.__data[NR_ATTITUDE_Y]      = 0.0      
+      self.__data[NR_ATTITUDE_Z]      = 0.0      
+      self.__data[NR_ANG_VEL_X]       = 0.0      
+      self.__data[NR_ANG_VEL_Y]       = 0.0      
+      self.__data[NR_ANG_VEL_Z]       = 0.0      
+      self.__data[NR_WARNING_LIFTOFF] = 0     
+      self.__data[NR_WARNING_RCS]     = 0     
+      self.__data[NR_WARNING_ESCAPE]  = 0     
+      self.__data[NR_WARNING_CHUTE]   = 0     
+      self.__data[NR_WARNING_LANDING] = 0     
+      self.__data[NR_WARNING_FAULT]   = 0     
+      return self.__data
 
       
    def __closeSerialPort(self):
