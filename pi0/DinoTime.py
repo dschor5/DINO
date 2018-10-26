@@ -86,7 +86,7 @@ class DinoTime(object):
       float
          Mission elapsed time (MET) in seconds.
       """
-      return time.time() - DinoTime.__startTime
+      return float(time.time() - DinoTime.__startTime)
 
 
    @staticmethod 
