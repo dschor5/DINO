@@ -28,6 +28,7 @@ class DinoThermalControl(object):
          # Initialize heater control through GPIO pin. 
          try:
             DinoThermalControl.__heater = LED(heaterPin)
+            DinoThermalControl.__heater.off()
          except:
             DinoLog.logMsg("ERROR - Could not initialize GPIO for heater.")
             DinoThermalControl.__heater = None
@@ -35,18 +36,11 @@ class DinoThermalControl(object):
          # Initialize cooler control through GPIO pin.
          try:
             DinoThermalControl.__cooler = LED(coolerPin)
+            DinoThermalControl.__cooler.off()
          except:
             DinoLog.logMsg("ERROR - Could not initialize GPIO for cooler.")
             DinoThermalControl.__cooler = None
       return DinoThermalControl.__instance
-
-
-   def __init__(self):
-      """
-      Initialize system with all devices turned off.
-      """
-      self.__state[STATE_HEATER] = self.setHeaterState(False)
-      self.__state[STATE_COOLER] = self.setCoolerState(False)
 
 
    def __del__(self):
