@@ -132,8 +132,8 @@ class DinoLog(object):
             DinoLog.EVENT_ID + str(DinoLog.__msgId) + DinoLog.CSV_SEP + \
             msg.replace(DinoLog.CSV_SEP, DinoLog.SAFE_SEP))   
 
-
-   def logData(self, data):
+   @staticmethod
+   def logData(data):
       """
       Log data captured during the test. 
       
@@ -149,8 +149,9 @@ class DinoLog(object):
       data : list
          List to conver to a comma separated format for logging.
       """
-      self.__dataId = self.__dataId + 1
-      self.__log(self.DATA_ID + str(self.__dataId) + self.CSV_SEP + str(data))
+      DinoLog.__dataId = DinoLog.__dataId + 1
+      DinoLog.__log(DinoLog.__instance, \
+         DinoLog.DATA_ID + str(DinoLog.__dataId) + DinoLog.CSV_SEP + str(data))
 
 
    def __log(self, msg):
