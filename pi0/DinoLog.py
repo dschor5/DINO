@@ -6,6 +6,21 @@ from DinoTime import *
 
 #TODO - Update to support re-entrancy. 
 
+# Unique identifiers to differenciate data and messages
+# recorded to the log. 
+DATA_ID        = "D"
+EVENT_ID       = "E"
+
+# Character used to separate entries. 
+# Defaults to comma separated values (CSV) as ",".
+CSV_SEP        = ","
+# Character used to replace commas within messages. 
+SAFE_SEP       = ";"
+
+# Format for data/event counters in the log.
+MET_STR_FORMAT = "0>8.2f"
+
+
 class DinoLog(object):
    """
    Class DinoLog - Logs data + errors at runtime.
@@ -18,20 +33,6 @@ class DinoLog(object):
    # DinoLog Singleton instance 
    __instance = None
    
-   # Unique identifiers to differenciate data and messages
-   # recorded to the log. 
-   DATA_ID        = "D"
-   EVENT_ID       = "E"
-
-   # Character used to separate entries. 
-   # Defaults to comma separated values (CSV) as ",".
-   CSV_SEP        = ","
-   # Character used to replace commas within messages. 
-   SAFE_SEP       = ";"
-
-   # Format for data/event counters in the log.
-   MET_STR_FORMAT = "0>8.2f"
-
 
    def __new__(cls, archiveName, debugEnable=False):
       """
@@ -63,7 +64,7 @@ class DinoLog(object):
 
          # Log initial entry to the file.
          DinoLog.__fp = None
-         DinoLog.__instance.__log(DinoLog.EVENT_ID + "0" + DinoLog.CSV_SEP + \
+         DinoLog.__instance.__log(EVENT_ID + "0" + CSV_SEP + \
              "Log file \"" + DinoLog.__filepath + "\" initialized.")
 
          # Initialize counters for logging.
@@ -129,8 +130,8 @@ class DinoLog(object):
       if((DinoLog.__debugEnable == True) and (debugMsg == True)):
          DinoLog.__msgId = DinoLog.__msgId + 1
          DinoLog.__log(DinoLog.__instance, \
-            DinoLog.EVENT_ID + str(DinoLog.__msgId) + DinoLog.CSV_SEP + \
-            msg.replace(DinoLog.CSV_SEP, DinoLog.SAFE_SEP))   
+            EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + \
+            msg.replace(CSV_SEP, SAFE_SEP))   
 
    @staticmethod
    def logData(data):
@@ -151,7 +152,7 @@ class DinoLog(object):
       """
       DinoLog.__dataId = DinoLog.__dataId + 1
       DinoLog.__log(DinoLog.__instance, \
-         DinoLog.DATA_ID + str(DinoLog.__dataId) + DinoLog.CSV_SEP + str(data))
+         DATA_ID + str(DinoLog.__dataId) + CSV_SEP + str(data))
 
 
    def __log(self, msg):
@@ -172,10 +173,10 @@ class DinoLog(object):
       """
       # Log entries include both the current time and the MET.
       timeStr = DinoTime.getTimestampStr()
-      metStr  = format(DinoTime.getMET(), self.MET_STR_FORMAT)
+      metStr  = format(DinoTime.getMET(), MET_STR_FORMAT)
 
       # Format for log messages
-      logEntry = timeStr + self.CSV_SEP + metStr + self.CSV_SEP + msg + "\n"
+      logEntry = timeStr + CSV_SEP + metStr + CSV_SEP + msg + "\n"
 
       # Log the message. Keep the file open. 
       if(self.__fp is None):
