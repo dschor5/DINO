@@ -35,27 +35,26 @@ class DinoMain(object):
 
          # Initialize time keeping functions + log
          DinoTime()
-         DinoLog(filename)    
+         DinoLog(filename)   
+
+         # Initialize all other interfaces
+         DinoMain._dinoCamera  = DinoCamera("video")
+         DinoMain._dinoEnv     = DinoEnvirophat()
+         DinoMain._dinoThermal = DinoThermalControl(HEATER_PIN, COOLER_PIN)
+         DinoMain._dinoServo   = DinoServo(SERVO_PIN)
+         DinoMain._dinoSerial  = DinoSerial('/dev/ttyAMA0')
+
+         # Initialize sensor data touple
+         DinoMain._data        = [None,] * I_SIZE
+
+         # Experiment state
+         DinoMain._currState   = DINO_STATE_INIT
+         DinoMain._prevState   = DINO_STATE_INIT
+
+         # Flag to terminate the test
+         DinoMain._endTest     = False
 
       return DinoMain.__instance
-
-   def __init__(self):
-      # Initialize all other interfaces
-      self._dinoCamera  = DinoCamera("video")
-      self._dinoEnv     = DinoEnvirophat()
-      self._dinoThermal = DinoThermalControl(HEATER_PIN, COOLER_PIN)
-      self._dinoServo   = DinoServo(SERVO_PIN)
-      self._dinoSerial  = DinoSerial('/dev/ttyAMA0')
-
-      # Initialize sensor data touple
-      self._data        = [None,] * I_SIZE
-
-      # Experiment state
-      self._currState   = DINO_STATE_INIT
-      self._prevState   = DINO_STATE_INIT
-
-      # Flag to terminate the test
-      self._endTest     = False
 
 
    def _readAllData(self):
@@ -97,9 +96,7 @@ class DinoMain(object):
       self._data[I_MAG_X]           = tempEnv[ENV_HAT_MAG_X]
       self._data[I_MAG_Y]           = tempEnv[ENV_HAT_MAG_Y]
       self._data[I_MAG_Z]           = tempEnv[ENV_HAT_MAG_Z]
-      return self._data
-      
-
+  
 
    def _determineState(self):
       """
