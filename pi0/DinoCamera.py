@@ -89,6 +89,13 @@ class DinoCamera(object):
       return DinoCamera.__instance
 
 
+   def __del__(self):
+      """
+      Destructor that stops the active recording and terminates the thread.
+      """
+      self.stopRecording()
+
+
    def isRecording(self):
       """
       Return True if thread is active and PiCamera is recording.
@@ -109,7 +116,7 @@ class DinoCamera(object):
       return num
 
 
-   def startRecording(self, single=True, duration=10):
+   def startRecording(self, duration=10, single=True):
       """
       Start a PiCamera recording. 
 
