@@ -3,5 +3,4 @@ __pycache__/
 *$py.class
 results_*/
 test_*/
-test/
-
+sim_*/
