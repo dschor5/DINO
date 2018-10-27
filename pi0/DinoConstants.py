@@ -17,10 +17,10 @@ HEATER_PIN = 16
 COOLER_PIN = 12
 
 # Camera recording duration in seconds
-CAMERA_REC_DURATION = 60
+CAMERA_REC_DURATION = 60.0
 
 # Servo agitation interval in seconds
-SERVO_AGITATION_INTERVAL = 4
+SERVO_AGITATION_INTERVAL = 4.0
 
 # Colors for printing output using ANSI escape sequences. 
 # From: http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html

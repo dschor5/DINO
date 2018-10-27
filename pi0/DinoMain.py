@@ -188,7 +188,7 @@ class DinoMain(object):
             self._endTest = True
 
          else: # currState == DINO_STATE_EXPERIMENT
-            self._dinoCamera.startRecording(False, CAMERA_REC_DURATION)
+            self._dinoCamera.startRecording(duration=CAMERA_REC_DURATION)
             self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
             #TODO Turn on spectrometer captures
          
