@@ -17,9 +17,10 @@ class DinoServo(object):
    # DinoServo Singleton instance 
    __instance = None
 
-   # Constants
+   # Constants for validating period between agitations.
    MIN_PERIOD = 1.0
    MAX_PERIOD = 10.0
+
 
    """ Singleton instance. """
    def __new__(cls, servoPin):
@@ -63,6 +64,11 @@ class DinoServo(object):
    def isAgitating(self):
       """
       Return True if thread is active and the servo is agitating.
+
+      Return
+      ------
+      bool
+         True if the thread to control the servo is running.
       """
       self.__lock.acquire()
       isAgitating = self.__isAgitating
@@ -179,6 +185,8 @@ class DinoServo(object):
             faultFound = True
 
          # Wait until it is time to agitate again.
+         # Unlike the Camera, the agitation period is very short and there is no risk
+         # of not saving data, so there is no risk if it gets abruptly terminated. 
          time.sleep(period)
 
       # Clear protected flag to show thread has started

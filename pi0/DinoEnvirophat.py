@@ -11,6 +11,23 @@ except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Envirophat not loaded.")
 
 
+# Index of telemetry read from Envirophat
+ENV_HAT_LIGHT_RED    = 0   # Envirophat light sensor red channel
+ENV_HAT_LIGHT_GREEN  = 1   # Envirophat light sensor green channel
+ENV_HAT_LIGHT_BLUE   = 2   # Envirophat light sensor blue channel
+ENV_HAT_LIGHT_CLEAR  = 3   # Envirophat light sensor clear channel
+ENV_HAT_TEMPERATURE  = 4   # Envirophat temperature sensor
+ENV_HAT_PRESSURE     = 5   # Envirophat pressure sensor
+ENV_HAT_ACCEL_X      = 6   # Envirophat acceleration along x-axis
+ENV_HAT_ACCEL_Y      = 7   # Envirophat acceleration along y-axis
+ENV_HAT_ACCEL_Z      = 8   # Envirophat acceleration along z-axis
+ENV_HAT_MAG_X        = 9   # Envirophat magnetometer x-axis
+ENV_HAT_MAG_Y        = 10  # Envirophat magnetometer y-axis
+ENV_HAT_MAG_Z        = 11  # Envirophat magnetometer z-axis
+ENV_HAT_SIZE         = 12
+
+
+
 class DinoEnvirophat(object):
    """ 
    Class DinoEnvirophat - Interface with EnviropHat.
@@ -40,6 +57,7 @@ class DinoEnvirophat(object):
       """
       if(DinoEnvirophat.__instance is None):
          DinoEnvirophat.__instance = object.__new__(cls)
+         DinoEnvirophat.__data = [None] * ENV_HAT_SIZE
 
          # Turns LEDs on the board off so that they do not 
          # interfere with the experiment.
@@ -54,35 +72,37 @@ class DinoEnvirophat(object):
       """
       Read all sensors in the envirophat and return them in a touple.
 
-         Index | Abbreviation | Description
-         ------------------------------------------------------
-          0    | LR           | Light red channel
-          1    | LG           | Light green channel
-          2    | LB           | Light blue channel
-          3    | LC           | Light clear channel
-          4    | T            | Temperature (C)
-          5    | P            | Pressure (Pa)
-          6    | AX           | Acceleration along x-axis
-          7    | AY           | Acceleration along y-axis
-          8    | AZ           | Acceleration along z-axis
-          9    | MX           | Magnetometer reading along x-axis
-         10    | MX           | Magnetometer reading along x-axis
-         11    | MX           | Magnetometer reading along x-axis
-
       Returns
       -------
-      touple
-         (LR, LG, LB, LC, T, P, AX, AY, AZ, MX, MY, MZ) 
+      list
+         List of raw telemetry readings from Envirophat organized
+         using the indeces of the ENV_HAT_* global variable. 
       """
-      data = ()
-      data = data + self.getLightSensorReadings()
-      data = data + self.getTemperature()
-      data = data + self.getPressure()
-      data = data + self.getAcceleration()
-      data = data + self.getMagReading()
-      return data
+      temp = self.__getLightSensorReadings()
+      self.__data[ENV_HAT_LIGHT_RED]   = temp[0]
+      self.__data[ENV_HAT_LIGHT_GREEN] = temp[1]
+      self.__data[ENV_HAT_LIGHT_BLUE]  = temp[2]
+      self.__data[ENV_HAT_LIGHT_CLEAR] = temp[3]
+
+      temp = self.__getTemperature()
+      self.__data[ENV_HAT_TEMPERATURE] = temp[0]
+
+      temp = self.__getPressure()
+      self.__data[ENV_HAT_PRESSURE] = temp[0]
+
+      temp = self.__getAcceleration()
+      self.__data[ENV_HAT_ACCEL_X] = temp[0]
+      self.__data[ENV_HAT_ACCEL_Y] = temp[1]
+      self.__data[ENV_HAT_ACCEL_Z] = temp[2]
+
+      temp = self.__getMagReading()
+      self.__data[ENV_HAT_MAG_X] = temp[0]
+      self.__data[ENV_HAT_MAG_Y] = temp[1]
+      self.__data[ENV_HAT_MAG_Z] = temp[2]
+
+      return self.__data
    
-   def getLightSensorReadings(self):
+   def __getLightSensorReadings(self):
       """ 
       Read raw light sensor readings from red, green, blue, and clear
       channels and return them in a touple.
@@ -93,20 +113,20 @@ class DinoEnvirophat(object):
          Light reading for (red, green, blue, and clear) channels.       
       """
       try:
-         data = light.raw()
+         temp = light.raw()
       except:
          DinoLog.logMsg("ERROR - Envirophat fail to read light sensor.")
-         data = (None, None, None, None)
-      return data
+         temp = (None, None, None, None)
+      return temp
             
 
-   def getTemperature(self):
+   def __getTemperature(self):
       """ 
       Read temperature in degree celsius. 
       
       Returns
       -------
-      float
+      touple
          Temperature in degree Celsius.
       """
       try:
@@ -116,7 +136,7 @@ class DinoEnvirophat(object):
          value = (None,)
       return value   
 
-   def getPressure(self):
+   def __getPressure(self):
       """ 
       Read pressure in Pa.
       
@@ -133,7 +153,7 @@ class DinoEnvirophat(object):
       return value
 
 
-   def getAcceleration(self):
+   def __getAcceleration(self):
       """ 
       Read acceleration in UNITS??? for (x,y,z) axis.
       
@@ -150,7 +170,7 @@ class DinoEnvirophat(object):
       return value
    
 
-   def getMagReading(self):
+   def __getMagReading(self):
       """ 
       Read magnetic field in UNITS??? for (x,y,z) axis.
       

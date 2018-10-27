@@ -27,7 +27,7 @@ class DinoTime(object):
    __startTime = 0
 
    # Minimum time difference to cause the time sync.
-   SYNC_TIME_MIN_THRESHOLD = 0.1
+   SYNC_TIME_MIN_THRESHOLD = 1
 
 
    def __new__(cls):
@@ -86,7 +86,7 @@ class DinoTime(object):
       float
          Mission elapsed time (MET) in seconds.
       """
-      return time.time() - DinoTime.__startTime
+      return float(time.time() - DinoTime.__startTime)
 
 
    @staticmethod 

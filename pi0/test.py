@@ -157,7 +157,7 @@ def testDinoCamera():
 
    testDesc = "PiCamera start recording."
    startRecMET = DinoTime.getMET()
-   status = camObj.startRecording(duration=60)
+   status = camObj.startRecording(duration=CAMERA_REC_DURATION)
    testEquals(testName, testDesc, status, True)   
    
    testDesc = "Check PiCamera recording mode."
@@ -183,7 +183,7 @@ def testDinoCamera():
 
    testDesc = "PiCamera start continuous recording."
    startRecMET = DinoTime.getMET()   
-   status = camObj.startRecording(single=False, duration=DinoCamera.MIN_DURATION)
+   status = camObj.startRecording(duration=DinoCamera.MIN_DURATION, single=False)
    testEquals(testName, testDesc, status, True)   
 
    testDesc = "Check PiCamera recording mode."
@@ -231,39 +231,36 @@ def testDinoEnvirophat():
    
       printSubheading(testName, "Test reading sensors " + str(i) + " of " + str(numTests) + ".")
 
-      value = env.getLightSensorReadings()
+      values = env.readData()
+
       testDesc = "Iteration #" + str(i) + " - Check light 'red' channel."
-      testNotNone(testName, testDesc, value[0])
+      testNotNone(testName, testDesc, values[ENV_HAT_LIGHT_RED])
       testDesc = "Iteration #" + str(i) + " - Check light 'green' channel."
-      testNotNone(testName, testDesc, value[1])
+      testNotNone(testName, testDesc, values[ENV_HAT_LIGHT_GREEN])
       testDesc = "Iteration #" + str(i) + " - Check light 'blue' channel."
-      testNotNone(testName, testDesc, value[2])
+      testNotNone(testName, testDesc, values[ENV_HAT_LIGHT_BLUE])
       testDesc = "Iteration #" + str(i) + " - Check light 'clear' channel."
-      testNotNone(testName, testDesc, value[3])
+      testNotNone(testName, testDesc, values[ENV_HAT_LIGHT_CLEAR])
       
-      value = env.getTemperature()
       testDesc = "Iteration #" + str(i) + " - Check temperature."
-      testNotNone(testName, testDesc, value[0])      
+      testNotNone(testName, testDesc, values[ENV_HAT_TEMPERATURE])      
       
-      value = env.getPressure()
       testDesc = "Iteration #" + str(i) + " - Check pressure."
-      testNotNone(testName, testDesc, value[0])
+      testNotNone(testName, testDesc, values[ENV_HAT_PRESSURE])
       
-      value = env.getAcceleration()
       testDesc = "Iteration #" + str(i) + " - Check acceleration x channel."
-      testNotNone(testName, testDesc, value[0])      
+      testNotNone(testName, testDesc, values[ENV_HAT_ACCEL_X])      
       testDesc = "Iteration #" + str(i) + " - Check acceleration y channel."
-      testNotNone(testName, testDesc, value[1])
+      testNotNone(testName, testDesc, values[ENV_HAT_ACCEL_Y])
       testDesc = "Iteration #" + str(i) + " - Check acceleration z channel."
-      testNotNone(testName, testDesc, value[2])   
+      testNotNone(testName, testDesc, values[ENV_HAT_ACCEL_Z])   
    
-      value = env.getMagReading()
       testDesc = "Iteration #" + str(i) + " - Check mag x channel."
-      testNotNone(testName, testDesc, value[0])      
+      testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])      
       testDesc = "Iteration #" + str(i) + " - Check mag y channel."
-      testNotNone(testName, testDesc, value[1])
+      testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])
       testDesc = "Iteration #" + str(i) + " - Check mag z channel."
-      testNotNone(testName, testDesc, value[2])   
+      testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])   
       
       sleep(1)      
 
@@ -287,55 +284,70 @@ def testDinoThermalControl():
 
    thermalState = thermal.getState()
    testDesc = "Default state for "
-   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
-   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+   testEquals(testName, testDesc + "heater is OFF", thermalState[STATE_HEATER], False)
+   testEquals(testName, testDesc + "cooler is OFF", thermalState[STATE_COOLER], False)
 
-   printSubheading(testName, "Turn heater ON for 10 seconds")
+   printSubheading(testName, "Turn heater ON for 5 seconds")
 
-   thermalState = thermal.run(TURN_ON_HEATER - 1)
-   testDesc = "Temperature=" + '{0:.1f}'.format(TURN_ON_HEATER - 1)
-   testEquals(testName, testDesc + " heater is ON ",  thermalState[DinoThermalControl.STATE_HEATER], True)
-   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+   thermalState[STATE_HEATER] = thermal.setHeaterState(True)
+   testDesc = "Turn heater ON."
+   testEquals(testName, testDesc,  thermalState[STATE_HEATER], True)
 
-   sleep(1)
+   thermalState[STATE_COOLER] = thermal.setCoolerState(True)
+   testDesc = "Reject turning cooler ON when the heater is already ON."
+   testEquals(testName, testDesc,  thermalState[STATE_COOLER], False)
 
-   thermalState = thermal.run(IDLE_TEMP)
-   testDesc = "Temperature=" + '{0:.1f}'.format(IDLE_TEMP)
-   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
-   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
+   thermalState[STATE_COOLER] = thermal.setCoolerState(False)
+   testdesc = "Accept turning cooler OFF when the heater is already ON."
+   testEquals(testName, testDesc,  thermalState[STATE_COOLER], False)
 
-   printSubheading(testName, "Turn cooler ON for 10 seconds")
+   thermalState = thermal.getState()
+   testDesc = "Check thermal state for "
+   testEquals(testName, testDesc + "heater is ON", thermalState[STATE_HEATER], True)
+   testEquals(testName, testDesc + "cooler is OFF", thermalState[STATE_COOLER], False)
 
-   thermalState = thermal.run(TURN_ON_COOLER + 1)
-   testDesc = "Temperature=" + '{0:.1f}'.format(TURN_ON_COOLER + 1)
-   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
-   testEquals(testName, testDesc + " cooler is ON ",  thermalState[DinoThermalControl.STATE_COOLER], True)
+   sleep(5)
 
-   sleep(1)
+   thermalState[STATE_HEATER] = thermal.setHeaterState(False)
+   testDesc = "Turn heater OFF."
+   testEquals(testName, testDesc, thermalState[STATE_HEATER], False)
 
-   thermalState = thermal.run(IDLE_TEMP)
-   testDesc = "Temperature=" + '{0:.1f}'.format(IDLE_TEMP)
-   testEquals(testName, testDesc + " heater is OFF", thermalState[DinoThermalControl.STATE_HEATER], False)
-   testEquals(testName, testDesc + " cooler is OFF", thermalState[DinoThermalControl.STATE_COOLER], False)
-  
-   printSubheading(testName, "Test thermal control logic")
 
-   for i in range(3):
-      currTemp  = round(TURN_ON_HEATER - 2)
-      while(currTemp < round(TURN_ON_COOLER + 2)):
-         currTemp = currTemp + 0.5
-         thermalState = thermal.run(currTemp)
-         print(testName + " - Temperature=" + '{0:.1f}'.format(currTemp) + " --> " + \
-            "HeaterOn=" + str(thermalState[DinoThermalControl.STATE_HEATER]) + ", " + \
-            "CoolerOn=" + str(thermalState[DinoThermalControl.STATE_COOLER]))
+   thermalState = thermal.getState()
+   testDesc = "Check thermal state for "
+   testEquals(testName, testDesc + "heater is OFF", thermalState[STATE_HEATER], False)
+   testEquals(testName, testDesc + "cooler is OFF", thermalState[STATE_COOLER], False)
 
-      currTemp  = round(TURN_ON_COOLER + 2)
-      while(currTemp < round(TURN_ON_HEATER - 2)):
-         currTemp = currTemp - 0.5
-         thermalState = thermal.run(currTemp)
-         print(testName + " - Temperature=" + '{0:.1f}'.format(currTemp) + " --> " + \
-            "HeaterOn=" + str(thermalState[DinoThermalControl.STATE_HEATER]) + ", " + \
-            "CoolerOn=" + str(thermalState[DinoThermalControl.STATE_COOLER]))
+   printSubheading(testName, "Turn cooler ON for 5 seconds")
+
+   thermalState[STATE_COOLER] = thermal.setCoolerState(True)
+   testDesc = "Turn cooler ON."
+   testEquals(testName, testDesc,  thermalState[STATE_HEATER], True)
+
+   thermalState[STATE_HEATER] = thermal.setHeaterState(True)
+   testDesc = "Reject turning heater ON when the cooler is already ON."
+   testEquals(testName, testDesc,  thermalState[STATE_COOLER], False)
+
+   thermalState[STATE_HEATER] = thermal.setHeaterState(False)
+   testdesc = "Accept turning heater OFF when the cooler is already ON."
+   testEquals(testName, testDesc,  thermalState[STATE_COOLER], False)
+
+   thermalState = thermal.getState()
+   testDesc = "Check thermal state for "
+   testEquals(testName, testDesc + "heater is ON", thermalState[STATE_HEATER], True)
+   testEquals(testName, testDesc + "cooler is OFF", thermalState[STATE_COOLER], False)
+
+   sleep(5)
+
+   thermalState[STATE_COOLER] = thermal.setCoolerState(False)
+   testDesc = "Turn cooler OFF."
+   testEquals(testName, testDesc,  thermalState[STATE_COOLER], False)
+
+
+   thermalState = thermal.getState()
+   testDesc = "Check thermal state for "
+   testEquals(testName, testDesc + " heater is OFF", thermalState[STATE_HEATER], False)
+   testEquals(testName, testDesc + " cooler is OFF", thermalState[STATE_COOLER], False)
 
 def testDinoServo():
    # Test variables

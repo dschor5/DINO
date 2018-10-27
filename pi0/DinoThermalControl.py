@@ -8,13 +8,16 @@ except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - GPIO for heater/cooler not loaded.")
 
 
+# Indeces into __state array to store whether the units are on/off.
+STATE_HEATER = 0
+STATE_COOLER = 1
+
+
 class DinoThermalControl(object):
 
    # DinoThermalControl Singleton instance 
    __instance = None
 
-   STATE_HEATER = 0
-   STATE_COOLER = 1
 
    """ Singleton instance. """
    def __new__(cls, heaterPin, coolerPin):
@@ -40,6 +43,19 @@ class DinoThermalControl(object):
       return DinoThermalControl.__instance
 
 
+   def __del__(self):
+      """ 
+      Destructor. Turn off all devices.
+      """
+      try:
+         self.__heater.off()
+         self.__cooler.off()
+      except:
+         pass
+      self.__state[STATE_HEATER] = False
+      self.__state[STATE_COOLER] = False
+
+
    def getState(self):
       """
       Get the state of the heater and cooler.
@@ -51,36 +67,9 @@ class DinoThermalControl(object):
       """
       return self.__state
 
-   
-   def run(self, temperature=25):
-      """
-      Run thermal control algorithm to control the heater/cooler.
-
-      Parameter
-      ---------
-      temperature : float
-         Current temperature in degree C.
-         Default set such that heater and cooler are off.
-         
-      Returns
-      -------
-      list
-         Heater state (on=True,off=False), Cooler state (on=True,off=False)
-      """
-      if(temperature < TURN_ON_HEATER):
-         self.__state[self.STATE_HEATER] = self.__setHeaterState(True)
-      else:
-         self.__state[self.STATE_HEATER] = self.__setHeaterState(False)
-      
-      if(temperature > TURN_ON_COOLER):
-         self.__state[self.STATE_COOLER] = self.__setCoolerState(True)
-      else:
-         self.__state[self.STATE_COOLER] = self.__setCoolerState(False)
-      
-      return self.__state
 
    
-   def __setHeaterState(self, turnOn):
+   def setHeaterState(self, turnOn):
       """
       Set heater state to ON or OFF.
 
@@ -94,19 +83,24 @@ class DinoThermalControl(object):
       bool
          True on success. False if error accessing GPIO.
       """
+      if((turnOn == True) and (self.__state[STATE_COOLER] == True)):
+         DinoLog.logMsg("ERROR - Attempted to turn on heater when the cooler in already on.")
+         turnOn = False
+
       try:
          if(turnOn == True):
             self.__heater.on()
          else:
             self.__heater.off()
-         status = self.__heater.is_lit
+         self.__state[STATE_HEATER] = self.__heater.is_lit
       except:
          DinoLog.logMsg("ERROR - Heater set(" + str(turnOn) + ") failed.")
-         status = False
-      return status
+         self.__state[STATE_HEATER] = False
+      return self.__state[STATE_HEATER]
      
 
-   def __setCoolerState(self, turnOn):
+
+   def setCoolerState(self, turnOn):
       """
       Set cooler state to ON or OFF.
 
@@ -120,17 +114,21 @@ class DinoThermalControl(object):
       bool
          True on success. False if error accessing GPIO.
       """
+      if((turnOn == True) and (self.__state[STATE_HEATER] == True)):
+         DinoLog.logMsg("ERROR - Attempted to turn on cooler when the heater in already on.")
+         turnOn = False
+
       try:
          if(turnOn == True):
             self.__cooler.on()
          else:
             self.__cooler.off()
-         status = self.__cooler.is_lit
+         self.__state[STATE_COOLER] = self.__cooler.is_lit
       except:
          
          DinoLog.logMsg("ERROR - Cooler set(" + str(turnOn) + ") failed.")
-         status = False
-      return status
+         self.__state[STATE_COOLER] = False
+      return self.__state[STATE_COOLER]
       
 
    
