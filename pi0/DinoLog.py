@@ -151,8 +151,18 @@ class DinoLog(object):
          List to conver to a comma separated format for logging.
       """
       DinoLog.__dataId = DinoLog.__dataId + 1
+      
+      # Format data for the log
+      dataList = []
+      for i in data:
+         if(isinstance(i, float) == True):
+            dataList.append('{0:.4f}'.format(i))
+         else:
+            dataList.append(str(i))
+      
+      # Write log entry
       DinoLog.__log(DinoLog.__instance, \
-         DATA_ID + str(DinoLog.__dataId) + CSV_SEP + str(data))
+         DATA_ID + str(DinoLog.__dataId) + CSV_SEP + CSV_SEP.join(dataList))
 
 
    def __log(self, msg):
