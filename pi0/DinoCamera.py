@@ -141,7 +141,7 @@ class DinoCamera(object):
       
       # Validate input parameters
       if((duration < self.MIN_DURATION) or (duration > self.MAX_DURATION)):
-         DinoLog.logMsg("ERROR - Invalid PiCamera recording duration=[" + str(duration) + "].", True)
+         DinoLog.logMsg("ERROR - Invalid PiCamera recording duration=[" + str(duration) + "].")
          return False
 
       # Record settings and start thread

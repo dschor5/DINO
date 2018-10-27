@@ -93,7 +93,7 @@ class DinoServo(object):
       """
       # Ensure there is no servo agitation thread in progress.
       if(self.isAgitating() == True):
-         DinoLog.logMsg("ERROR - Servo agitation already in progress.")
+         DinoLog.logMsg("ERROR - Servo agitation already in progress.", True)
          return False
       
       # Validate input parameters
