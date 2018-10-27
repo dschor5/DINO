@@ -119,7 +119,6 @@ class DinoMain(object):
          self._currState = DINO_STATE_FINISHED
       else:
          self._currState = DINO_STATE_INIT       
-      print(str(self._prevState) + " -> " + str(self._currState))
 
       # Capture state transitions in the log
       if(self._prevState != self._currState):
@@ -149,7 +148,6 @@ class DinoMain(object):
       else:
          temperature = 0 #TODO
 
-      print("Temp = " + str(temperature) + " < " + str(TURN_ON_HEATER))
       # Control heater
       if(temperature < TURN_ON_HEATER):
          self._dinoThermal.setHeaterState(True)
@@ -178,8 +176,6 @@ class DinoMain(object):
 
          # Run thermal algorithm
          self._runThermalControl()
-         
-         DinoLog.logMsg("test")
 
          # Perform state specific tasks   
          if(self._currState == DINO_STATE_ASCENT or self._currState == DINO_STATE_DESCENT):
@@ -192,13 +188,12 @@ class DinoMain(object):
             self._endTest = True
 
          else: # currState == DINO_STATE_EXPERIMENT
-            print("STATE 1")
             self._dinoCamera.startRecording(False, CAMERA_REC_DURATION)
             self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
             #TODO Turn on spectrometer captures
          
          # Sleep for 0.05sec. By the time it wakes up, 
          # there should be serial data readily available.
-         #sleep(0.1)
+         sleep(0.1)
          
 
