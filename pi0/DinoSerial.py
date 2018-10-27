@@ -8,39 +8,9 @@ except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Serial interface not loaded.")
 
 
-# Possible flight states sent by New Shepard vehicle to the payload.
-# From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
-NR_STATE_NONE        = '@' # No flight state has been reached yet 
-                           #    (typically the time prior to liftoff).
-NR_STATE_LIFTOFF     = 'A' # This state is triggered once sensed acceleration 
-                           #    first changes due to engine ignition.
-NR_STATE_MECO        = 'B' # This state is triggered after the rocket's main engine 
-                           #    cuts out, and the flight enters its coast stage.
-NR_STATE_SEPARATION  = 'C' # This state occurs after the rocket and capsule 
-                           #    separate, shortly before the microgravity 
-                           #    portion of the flight begins.
-NR_STATE_COAST_START = 'D' # This state indicates the beginning of the cleanest 
-                           #    microgravity operations onboard the capsule, 
-                           #    most experiments should begin logging data at this time.
-NR_STATE_APOGEE      = 'E' # This state occurs when the vehicle has reached its 
-                           #    maximum altitude and begins to descend.
-NR_STATE_COAST_END   = 'F' # This state indicates the end of microgravity operations 
-                           #    onboard the capsule, as we begin to experience 
-                           #    atmospheric accelerations. Many experiments will 
-                           #    cease logging data at this time.
-NR_STATE_UNDER_CHUTE = 'G' # This state indicates that drogue parachutes have 
-                           #    deployed and the capsule is in its final descent.
-NR_STATE_LANDING     = 'H' # This state occurs after capsule touchdown.
-NR_STATE_SAFING      = 'I' # After touchdown, this state indicates that the 
-                           #    capsule is venting and safing all energetic systems.
-NR_STATE_FINISHED    = 'J' # This state is only ever reached in simulation and 
-                           #    indicates the end of the logged flight data.
-
-
 # Field names within the New Shepard packet received at 10Hz.
 # From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
 NR_FLIGHT_STATE    = 0     # Current flight state as a single ASCII char. 
-                           # States defined in NR_STATE_* enum above.
 NR_EXP_TIME        = 1     # Current experiment time in seconds as decimal 
                            # number with 2 digits following the decimal point.
 NR_ALTITUDE        = 2     # Current vehicle altitude above ground level in feet as a 
@@ -68,6 +38,36 @@ NR_WARNING_CHUTE   = 18    # Triggered shortly before drogue chute deployments
 NR_WARNING_LANDING = 19    # Triggered by altitude shortly before the capsule touches down
 NR_WARNING_FAULT   = 20    # Triggered in anticipation of an abnormally hard landing
 NR_SIZE            = 21  
+
+# Possible flight states sent by New Shepard vehicle to the payload.
+# From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
+NR_STATE_NONE        = 0   # @  No flight state has been reached yet 
+                           #    (typically the time prior to liftoff).
+NR_STATE_LIFTOFF     = 1   # A  This state is triggered once sensed acceleration 
+                           #    first changes due to engine ignition.
+NR_STATE_MECO        = 2   # B  This state is triggered after the rocket's main engine 
+                           #    cuts out, and the flight enters its coast stage.
+NR_STATE_SEPARATION  = 3   # C  This state occurs after the rocket and capsule 
+                           #    separate, shortly before the microgravity 
+                           #    portion of the flight begins.
+NR_STATE_COAST_START = 4  # D  This state indicates the beginning of the cleanest 
+                           #    microgravity operations onboard the capsule, 
+                           #    most experiments should begin logging data at this time.
+NR_STATE_APOGEE      = 5   # E  This state occurs when the vehicle has reached its 
+                           #    maximum altitude and begins to descend.
+NR_STATE_COAST_END   = 6   # F  This state indicates the end of microgravity operations 
+                           #    onboard the capsule, as we begin to experience 
+                           #    atmospheric accelerations. Many experiments will 
+                           #    cease logging data at this time.
+NR_STATE_UNDER_CHUTE = 7   # G  This state indicates that drogue parachutes have 
+                           #    deployed and the capsule is in its final descent.
+NR_STATE_LANDING     = 8   # H  This state occurs after capsule touchdown.
+NR_STATE_SAFING      = 9   # I  After touchdown, this state indicates that the 
+                           #    capsule is venting and safing all energetic systems.
+NR_STATE_FINISHED    = 10  # J  This state is only ever reached in simulation and 
+                           #    indicates the end of the logged flight data.
+NR_STATE_LETTERS = "@ABCDEFGHIJ"  
+
 
 class DinoSerial(object):
 
@@ -156,7 +156,7 @@ class DinoSerial(object):
          DinoLog.logMsg("ERROR - Could not open serial port.")
       
    def readData(self):
-      self.__data[NR_FLIGHT_STATE]    = 0 #"@"
+      self.__data[NR_FLIGHT_STATE]    = "@"
       self.__data[NR_EXP_TIME]        = DinoTime.getMET()
       self.__data[NR_ALTITUDE]        = 0.0
       self.__data[NR_VELOCITY_X]      = 0.0      

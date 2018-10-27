@@ -19,7 +19,7 @@ DINO_STATE_INIT       = 0
 DINO_STATE_ASCENT     = 1
 DINO_STATE_EXPERIMENT = 2
 DINO_STATE_DESCENT    = 3
-DINO_STATE_FINISH     = 4
+DINO_STATE_FINISHED   = 4
 
 
 class DinoMain(object):
@@ -105,12 +105,25 @@ class DinoMain(object):
       # Record previous state. 
       self._prevState = self._currState
       
-      # Logic to determine the current experiment state
       
+      # Logic to determine the current experiment state
+      nrState = NR_STATE_LETTERS.index(self._data[I_FLIGHT_STATE])
+      
+      if(nrState < NR_STATE_MECO):
+         self._currState = DINO_STATE_ASCENT
+      elif(nrState < NR_STATE_UNDER_CHUTE):
+         self._currState = DINO_STATE_EXPERIMENT   
+      elif(nrState < NR_STATE_LANDING):
+         self._currState = DINO_STATE_DESCENT
+      elif(nrState >= NR_STATE_LANDING):
+         self._currState = DINO_STATE_FINISHED
+      else:
+         self._currState = DINO_STATE_INIT       
+      print(str(self._prevState) + " -> " + str(self._currState))
 
       # Capture state transitions in the log
       if(self._prevState != self._currState):
-         DinoLog.logMsg("Transitioned to state=" + self._currState)
+         DinoLog.logMsg("Transitioned to state=" + str(self._currState))
       return self._currState
 
 
@@ -136,6 +149,7 @@ class DinoMain(object):
       else:
          temperature = 0 #TODO
 
+      print("Temp = " + str(temperature) + " < " + str(TURN_ON_HEATER))
       # Control heater
       if(temperature < TURN_ON_HEATER):
          self._dinoThermal.setHeaterState(True)
@@ -164,25 +178,27 @@ class DinoMain(object):
 
          # Run thermal algorithm
          self._runThermalControl()
+         
+         DinoLog.logMsg("test")
 
          # Perform state specific tasks   
          if(self._currState == DINO_STATE_ASCENT or self._currState == DINO_STATE_DESCENT):
+
             self._dinoCamera.stopRecording()
             self._dinoServo.stopServo()
             #TODO Turn off spectrometer captures
 
-         elif(self._currState == DINO_STATE_FINISH):
+         elif(self._currState == DINO_STATE_FINISHED):
             self._endTest = True
 
          else: # currState == DINO_STATE_EXPERIMENT
+            print("STATE 1")
             self._dinoCamera.startRecording(False, CAMERA_REC_DURATION)
             self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
             #TODO Turn on spectrometer captures
          
          # Sleep for 0.05sec. By the time it wakes up, 
          # there should be serial data readily available.
-         sleep(0.05)
+         #sleep(0.1)
          
-         #TODO 
-         self._endTest = True
 
