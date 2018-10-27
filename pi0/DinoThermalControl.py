@@ -47,8 +47,13 @@ class DinoThermalControl(object):
       """ 
       Destructor. Turn off all devices.
       """
-      self.__state[STATE_HEATER] = self.setHeaterState(False)
-      self.__state[STATE_COOLER] = self.setCoolerState(False)
+      try:
+         self.__heater.off()
+         self.__cooler.off()
+      except:
+         pass
+      self.__state[STATE_HEATER] = False
+      self.__state[STATE_COOLER] = False
 
 
    def getState(self):
