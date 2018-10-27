@@ -127,7 +127,7 @@ class DinoLog(object):
       debugMsg : bool
          Flag to log      
       """
-      if((DinoLog.__debugEnable == True) and (debugMsg == True)):
+      if((DinoLog.__debugEnable == False) or ((DinoLog.__debugEnable == True) and (debugMsg == True))):
          DinoLog.__msgId = DinoLog.__msgId + 1
          DinoLog.__log(DinoLog.__instance, \
             EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + \
@@ -160,7 +160,6 @@ class DinoLog(object):
          else:
             dataList.append(str(i))
       
-      # Write log entry
       DinoLog.__log(DinoLog.__instance, \
          DATA_ID + str(DinoLog.__dataId) + CSV_SEP + CSV_SEP.join(dataList))
 
