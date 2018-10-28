@@ -1,3 +1,7 @@
+from threading     import Thread # Thread to record continuously
+from threading     import RLock  # Note re-entrant lock
+from threading     import Event  # Events for communicating within threads
+
 from DinoConstants import *
 from DinoTime      import *
 from DinoLog       import *

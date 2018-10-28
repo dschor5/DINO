@@ -17,7 +17,7 @@ HEATER_PIN = 16
 COOLER_PIN = 12
 
 # Camera recording duration in seconds
-CAMERA_REC_DURATION = 60.0
+CAMERA_REC_DURATION = 30.0
 
 # Servo agitation interval in seconds
 SERVO_AGITATION_INTERVAL = 4.0

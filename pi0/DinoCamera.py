@@ -231,7 +231,7 @@ class DinoCamera(object):
          # Start new recording. If successful, increment the recording counter.
          try:
             self.__camera.start_recording(self.__folder + "/" + filepath)
-            DinoLog.logMsg("Start PiCamera file=[" + filepath + "]")
+            #DinoLog.logMsg("Start PiCamera file=[" + filepath + "]")
             lockCount.acquire()
             self.__count = self.__count + 1
             lockCount.release()
