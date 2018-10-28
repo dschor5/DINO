@@ -21,10 +21,7 @@ ENV_HAT_PRESSURE     = 5   # Envirophat pressure sensor
 ENV_HAT_ACCEL_X      = 6   # Envirophat acceleration along x-axis
 ENV_HAT_ACCEL_Y      = 7   # Envirophat acceleration along y-axis
 ENV_HAT_ACCEL_Z      = 8   # Envirophat acceleration along z-axis
-ENV_HAT_MAG_X        = 9   # Envirophat magnetometer x-axis
-ENV_HAT_MAG_Y        = 10  # Envirophat magnetometer y-axis
-ENV_HAT_MAG_Z        = 11  # Envirophat magnetometer z-axis
-ENV_HAT_SIZE         = 12
+ENV_HAT_SIZE         = 9
 
 
 
@@ -95,11 +92,6 @@ class DinoEnvirophat(object):
       self.__data[ENV_HAT_ACCEL_Y] = temp[1]
       self.__data[ENV_HAT_ACCEL_Z] = temp[2]
 
-      temp = self.__getMagReading()
-      self.__data[ENV_HAT_MAG_X] = temp[0]
-      self.__data[ENV_HAT_MAG_Y] = temp[1]
-      self.__data[ENV_HAT_MAG_Z] = temp[2]
-
       return self.__data
    
    def __getLightSensorReadings(self):
@@ -166,23 +158,6 @@ class DinoEnvirophat(object):
          value = motion.accelerometer()
       except:
          DinoLog.logMsg("ERROR - Envirophat fail to read acceleration.")
-         value = (None, None, None)
-      return value
-   
-
-   def __getMagReading(self):
-      """ 
-      Read magnetic field in UNITS??? for (x,y,z) axis.
-      
-      Returns
-      -------
-      touple
-         Magnetic field touple (x,y,z) in UNITS???
-      """
-      try:
-         value = motion.magnetometer()
-      except:
-         DinoLog.logMsg("ERROR - Envirophat fail to read magnetometer.")
          value = (None, None, None)
       return value
 

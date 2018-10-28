@@ -15,10 +15,13 @@ from DinoThermalControl import *  # GPIO interface for heater and cooler
 from DinoSpectrometer   import *  # Spectrometer interface
 
 
+THERMAL_CONTROL_PERIOD = 10 # Unit: 1/10 sec 
+
+
 DINO_STATE_INIT       = 0
-DINO_STATE_ASCENT     = 1
+DINO_STATE_START_EXP  = 1
 DINO_STATE_EXPERIMENT = 2
-DINO_STATE_DESCENT    = 3
+DINO_STATE_END_EXP    = 3
 DINO_STATE_FINISHED   = 4
 
 
@@ -51,6 +54,9 @@ class DinoMain(object):
          DinoMain._currState   = DINO_STATE_INIT
          DinoMain._prevState   = DINO_STATE_INIT
 
+         # Flag to decimate thermal algorithm
+         DinoMain._thermalCount = 0
+
          # Flag to terminate the test
          DinoMain._endTest     = False
 
@@ -68,22 +74,7 @@ class DinoMain(object):
 
       self._data[I_FLIGHT_STATE]    = tempSerial[NR_FLIGHT_STATE]
       self._data[I_ALTITUDE]        = tempSerial[NR_ALTITUDE]
-      self._data[I_VELOCITY_X]      = tempSerial[NR_VELOCITY_X]
-      self._data[I_VELOCITY_Y]      = tempSerial[NR_VELOCITY_Y]
-      self._data[I_VELOCITY_Z]      = tempSerial[NR_VELOCITY_Z]
       self._data[I_ACCELERATION]    = tempSerial[NR_ACCELERATION]
-      self._data[I_ATTITUDE_X]      = tempSerial[NR_ATTITUDE_X]
-      self._data[I_ATTITUDE_Y]      = tempSerial[NR_ATTITUDE_Y]
-      self._data[I_ATTITUDE_Z]      = tempSerial[NR_ATTITUDE_Z]
-      self._data[I_ANG_VEL_X]       = tempSerial[NR_ANG_VEL_X]
-      self._data[I_ANG_VEL_Y]       = tempSerial[NR_ANG_VEL_Y]
-      self._data[I_ANG_VEL_Z]       = tempSerial[NR_ANG_VEL_Z]
-      self._data[I_WARNING_LIFTOFF] = tempSerial[NR_WARNING_LIFTOFF]
-      self._data[I_WARNING_RCS]     = tempSerial[NR_WARNING_RCS]
-      self._data[I_WARNING_ESCAPE]  = tempSerial[NR_WARNING_ESCAPE]
-      self._data[I_WARNING_CHUTE]   = tempSerial[NR_WARNING_CHUTE]
-      self._data[I_WARNING_LANDING] = tempSerial[NR_WARNING_LANDING]
-      self._data[I_WARNING_FAULT]   = tempSerial[NR_WARNING_FAULT]
       self._data[I_LIGHT_RED]       = tempEnv[ENV_HAT_LIGHT_RED]
       self._data[I_LIGHT_GREEN]     = tempEnv[ENV_HAT_LIGHT_GREEN]
       self._data[I_LIGHT_BLUE]      = tempEnv[ENV_HAT_LIGHT_BLUE]
@@ -93,10 +84,7 @@ class DinoMain(object):
       self._data[I_ACCEL_X]         = tempEnv[ENV_HAT_ACCEL_X]
       self._data[I_ACCEL_Y]         = tempEnv[ENV_HAT_ACCEL_Y]
       self._data[I_ACCEL_Z]         = tempEnv[ENV_HAT_ACCEL_Z]
-      self._data[I_MAG_X]           = tempEnv[ENV_HAT_MAG_X]
-      self._data[I_MAG_Y]           = tempEnv[ENV_HAT_MAG_Y]
-      self._data[I_MAG_Z]           = tempEnv[ENV_HAT_MAG_Z]
-  
+      
 
    def _determineState(self):
       """
@@ -110,15 +98,19 @@ class DinoMain(object):
       nrState = NR_STATE_LETTERS.index(self._data[I_FLIGHT_STATE])
       
       if(nrState < NR_STATE_MECO):
-         self._currState = DINO_STATE_ASCENT
+         self._currState = DINO_STATE_INIT
+         
       elif(nrState < NR_STATE_UNDER_CHUTE):
-         self._currState = DINO_STATE_EXPERIMENT   
+         if(self._currState == DINO_STATE_INIT):
+            self._currState = DINO_STATE_START_EXP
+         else:
+            self._currState = DINO_STATE_EXPERIMENT
+            
       elif(nrState < NR_STATE_LANDING):
-         self._currState = DINO_STATE_DESCENT
-      elif(nrState >= NR_STATE_LANDING):
-         self._currState = DINO_STATE_FINISHED
+         self._currState = DINO_STATE_END_EXP    
+         
       else:
-         self._currState = DINO_STATE_INIT       
+         self._currState = DINO_STATE_FINISHED
 
       # Capture state transitions in the log
       if(self._prevState != self._currState):
@@ -140,6 +132,12 @@ class DinoMain(object):
       This function serves as a wrapper for the DinoThermalControl.run()
       so that is can incorporate trending information if needed.
       """
+      if(self._thermalCount > THERMAL_CONTROL_PERIOD):
+         self._thermalCount = 0
+      else:
+         self._thermalCount = self._thermalCount + 1
+         return False
+      
       # Determine temperature
       if(self._data[I_TEMPERATURE] is not None):
          temperature = self._data[I_TEMPERATURE]
@@ -160,9 +158,8 @@ class DinoMain(object):
       else:
          self._dinoThermal.setCoolerState(False)
    
-
+      return True
    def run(self):
-
 
 
       while(self._endTest == False):
@@ -177,20 +174,26 @@ class DinoMain(object):
          # Run thermal algorithm
          self._runThermalControl()
 
-         # Perform state specific tasks   
-         if(self._currState == DINO_STATE_ASCENT or self._currState == DINO_STATE_DESCENT):
-
-            self._dinoCamera.stopRecording()
-            self._dinoServo.stopServo()
-            #TODO Turn off spectrometer captures
-
-         elif(self._currState == DINO_STATE_FINISHED):
-            self._endTest = True
-
-         else: # currState == DINO_STATE_EXPERIMENT
+         if(self._currState == DINO_STATE_INIT):
+            pass
+            
+         elif(self._currState == DINO_STATE_START_EXP):
             self._dinoCamera.startRecording(duration=CAMERA_REC_DURATION)
             self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
             #TODO Turn on spectrometer captures
+            
+         elif(self._currState == DINO_STATE_EXPERIMENT):
+            pass
+            
+         elif(self._currState == DINO_STATE_END_EXP):
+            self._dinoCamera.stopRecording()
+            self._dinoServo.stopServo()
+            #TODO Turn off spectrometer captures            
+                        
+         else:
+            self._endTest = True
+            
+
          
          # Sleep for 0.05sec. By the time it wakes up, 
          # there should be serial data readily available.

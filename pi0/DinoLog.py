@@ -186,11 +186,11 @@ class DinoLog(object):
       logEntry = timeStr + CSV_SEP + metStr + CSV_SEP + msg + "\n"
 
       # Log the message. Keep the file open. 
-      #if(self.__fp is None):
-      #   self.__fp = open(self.__filepath, 'a')
-      #self.__fp.write(logEntry)
-      #self.__fp.flush()      
-      print(logEntry)
+      if(self.__fp is None):
+         self.__fp = open(self.__filepath, 'a')
+      self.__fp.write(logEntry)
+      self.__fp.flush()      
+      #print(logEntry)
 
 
    def __del__(self):

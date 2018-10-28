@@ -174,10 +174,10 @@ class DinoServo(object):
                faultFound = True
             elif(self.__servo.value > 0):
                self.__servo.min()
-               DinoLog.logMsg("Servo moved to min position.")
+               #DinoLog.logMsg("Servo moved to min position.")
             else:
                self.__servo.max()            
-               DinoLog.logMsg("Servo moved to max position.")
+               #DinoLog.logMsg("Servo moved to max position.")
                
          except:
             DinoLog.logMsg("ERROR - Failed to move servo.")
