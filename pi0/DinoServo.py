@@ -45,7 +45,7 @@ class DinoServo(object):
             DinoServo.__stop = Event()
             DinoServo.__stop.set()
          except:
-            DinoLog.logMsg("ERROR - Could not create event for PiCamera().")
+            DinoLog.logMsg("ERROR - Could not create event for servo.")
 
          # Create PiCamera object.
          # Change configuration parameters as needed for the 
@@ -57,7 +57,7 @@ class DinoServo(object):
                frame_width     = 20/1000)
          except:
             DinoServo.__servo = None
-            DinoLog.logMsg("ERROR - Could not create PWMOutputDevice() object.")
+            DinoLog.logMsg("ERROR - Could not create Servo() object.")
       return DinoServo.__instance
 
 
@@ -93,7 +93,6 @@ class DinoServo(object):
       """
       # Ensure there is no servo agitation thread in progress.
       if(self.isAgitating() == True):
-         DinoLog.logMsg("ERROR - Servo agitation already in progress.", True)
          return False
       
       # Validate input parameters

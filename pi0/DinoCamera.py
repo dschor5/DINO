@@ -136,7 +136,6 @@ class DinoCamera(object):
       """
       # Ensure there is no recording in progress.
       if(self.isRecording() == True):
-         DinoLog.logMsg("ERROR - PiCamera recording already in progress.", True)
          return False
       
       # Validate input parameters
@@ -246,7 +245,7 @@ class DinoCamera(object):
          recStartTime = DinoTime.getMET() 
          recTime = DinoTime.getMET() - recStartTime
          while((recTime <= self.__duration) and (stopEvent.isSet() == False and (faultFound == False))):
-            time.sleep(1)
+            time.sleep(2)
             recTime = DinoTime.getMET() - recStartTime
 
          # Stop the recording.

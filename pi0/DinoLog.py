@@ -34,7 +34,7 @@ class DinoLog(object):
    __instance = None
    
 
-   def __new__(cls, archiveName, debugEnable=False):
+   def __new__(cls, archiveName):
       """
       Create a singleton instance and initialize the DinoLog. 
 
@@ -56,7 +56,6 @@ class DinoLog(object):
 
          # Generate filename for archive and create a new folder to store the data.
          timestamp = DinoTime.getTimestampStr()
-         DinoLog.__debugEnable = debugEnable
          DinoLog.__folder = archiveName + "_" + timestamp
          DinoLog.__filepath = DinoLog.__folder + "/" + archiveName + "_" + timestamp + ".txt"
          if(not os.path.exists(os.path.dirname(DinoLog.__filepath))):
@@ -127,11 +126,10 @@ class DinoLog(object):
       debugMsg : bool
          Flag to log      
       """
-      if((DinoLog.__debugEnable == False) or ((DinoLog.__debugEnable == True) and (debugMsg == True))):
-         DinoLog.__msgId = DinoLog.__msgId + 1
-         DinoLog.__log(DinoLog.__instance, \
-            EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + \
-            msg.replace(CSV_SEP, SAFE_SEP))   
+      DinoLog.__msgId = DinoLog.__msgId + 1
+      DinoLog.__log(DinoLog.__instance, \
+         EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + \
+         msg.replace(CSV_SEP, SAFE_SEP))   
 
    @staticmethod
    def logData(data):
@@ -188,10 +186,11 @@ class DinoLog(object):
       logEntry = timeStr + CSV_SEP + metStr + CSV_SEP + msg + "\n"
 
       # Log the message. Keep the file open. 
-      if(self.__fp is None):
-         self.__fp = open(self.__filepath, 'a')
-      self.__fp.write(logEntry)
-      self.__fp.flush()      
+      #if(self.__fp is None):
+      #   self.__fp = open(self.__filepath, 'a')
+      #self.__fp.write(logEntry)
+      #self.__fp.flush()      
+      print(logEntry)
 
 
    def __del__(self):
