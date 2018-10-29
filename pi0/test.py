@@ -255,12 +255,12 @@ def testDinoEnvirophat():
       testDesc = "Iteration #" + str(i) + " - Check acceleration z channel."
       testNotNone(testName, testDesc, values[ENV_HAT_ACCEL_Z])   
    
-      testDesc = "Iteration #" + str(i) + " - Check mag x channel."
-      testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])      
-      testDesc = "Iteration #" + str(i) + " - Check mag y channel."
-      testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])
-      testDesc = "Iteration #" + str(i) + " - Check mag z channel."
-      testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])   
+      #testDesc = "Iteration #" + str(i) + " - Check mag x channel."
+      #testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])      
+      #testDesc = "Iteration #" + str(i) + " - Check mag y channel."
+      #testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])
+      #testDesc = "Iteration #" + str(i) + " - Check mag z channel."
+      #testNotNone(testName, testDesc, values[ENV_HAT_MAG_X])   
       
       sleep(1)      
 
@@ -437,7 +437,7 @@ def testDinoSpectrometer():
 if(__name__ == "__main__"):
    # Initialize time system
    DinoTime()
-   DinoLog("test", debugEnable=True)
+   DinoLog("test")
 
    if((len(sys.argv) == 1) or ("DinoTime" in sys.argv)):
       printHeading("Test DinoTime class")

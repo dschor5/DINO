@@ -98,16 +98,12 @@ class DinoLog(object):
 
 
    @staticmethod
-   def logMsg(msg, debugMsg=False):
+   def logMsg(msg):
       """
       Log status/warning/error messages from application. 
       
       This is a static method such that it can be called from any of 
       the classes without needing to first get an instance of the class.
-
-      If the debugMsg flag is set, then the messages will only 
-      be recorded if debug was enabled at initialization. Otherwise,
-      the message will be skipped completely.
 
       The same log file is used to capture both messages and data. 
       Each of the two types has a unique counter to track how many 
@@ -122,9 +118,7 @@ class DinoLog(object):
       Parameter
       ---------
       data : str
-         String to print to the file.  
-      debugMsg : bool
-         Flag to log      
+         String to print to the file.       
       """
       DinoLog.__msgId = DinoLog.__msgId + 1
       DinoLog.__log(DinoLog.__instance, \
