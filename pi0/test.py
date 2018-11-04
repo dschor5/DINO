@@ -1,6 +1,8 @@
 from   time import *
 import os
 import sys
+import csv
+sys.path.append("../NanoLambda/wrappers/python")
 
 from DinoConstants import *  # Project constants
 from DinoTestUtils import *  # Test utilities
@@ -18,6 +20,24 @@ from DinoSpectrometer   import *  # Spectrometer interface
 
 printHeading("End initialization (" + strftime("%Y%m%d-%H%M%S") + ")")
 printHeading("Start test (" + strftime("%Y%m%d-%H%M%S") + ")")
+
+if(sys.version_info[0] < 3):
+    from wrapper_python2 import *
+    from wrapper_python2.core import *
+    from wrapper_python2.device import *
+    from wrapper_python2.color import *
+    print ("**********************************************************************")
+    print ("[Python-2]        Python Version : ", sys.version_info.major, "." ,sys.version_info.minor , " Detected")
+    print ("**********************************************************************")
+else:
+    print ("**********************************************************************")
+    print ("[Python-3]        Python Version : ", sys.version_info.major, "." ,sys.version_info.minor , " Detected")
+    print ("**********************************************************************")
+    from wrapper_python3 import *
+    from wrapper_python3.core import *
+    from wrapper_python3.device import *
+    from wrapper_python3.color import *
+
 
 
 def testDinoTime():
@@ -431,7 +451,10 @@ def testDinoSpectrometer():
    # Test variables
    testName = "DinoSpectrometer"
    testDesc = ""
-   print("No tests defined.")
+   print("Testing DinoSpectrometer")
+   obj1= DinoSpectrometer()
+   obj1.initialize()
+   obj1.captureSpectrum()
 
 
 if(__name__ == "__main__"):
