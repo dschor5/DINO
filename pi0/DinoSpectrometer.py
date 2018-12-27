@@ -1,4 +1,4 @@
-
+import time
 from DinoConstants import *
 from DinoTime      import *
 from DinoLog       import *
@@ -18,6 +18,7 @@ class DinoSpectrometer(object):
    __instance = None
    """ Singleton instance. """
    connectReturn = 0;
+   fileName = ""
    def __new__(self):
       #print"Create the Spectrometer Object")
       if(DinoSpectrometer.__instance is None):
@@ -89,7 +90,18 @@ class DinoSpectrometer(object):
                       writer.writerow(line)
                   csv_file.close()
                else:
+                  localtime = time.localtime(time.time())
+                  completetime = str(localtime.tm_year) + \
+                                 str(localtime.tm_mon) + \
+                                 str(localtime.tm_mday) + \
+                                 str(localtime.tm_hour) + \
+                                 str(localtime.tm_min) + \
+                                 str(localtime.tm_sec)            
                   fileName = (b"SpecrtumData3_" + sensorID + b".csv");
+                  if(object.fileName == ""):
+                   fileName = (completetime + ".csv")
+                  else:
+                   fileName =object.fileName
                   data = []
                   for i in range(get_spectrum_length(object.pSpecCore)):
                      data.append(str(specData[i]).split(","))
