@@ -1,13 +1,33 @@
+###############################################################################
+#
+#                              DinoSpectrograph
+#
+# Programmer            Version         Date
+# Fred Bourbour          1.0           12/27/18
+##############################################################################
+
+# runs with python2
 import csv
 from matplotlib import style
 from matplotlib import pyplot as plt
 import numpy as np
 import array
-import plotly.plotly as p
+import sys
+import os.path
 
+if(sys.argv[1] == ""):
+ if (os.path.isfile('Dino.csv') == false):
+  print('No Spectrum file was found')
+  exit
+ else:
+  fileName = 'Dino.csv'
+else:
+ fileName = sys.argv[1]
+ 
+print(fileName) 
 
 style.use('ggplot')
-y = np.loadtxt('Dino.csv',
+y = np.loadtxt(fileName,
                   unpack = True,
                   delimiter = ' ')
 
@@ -18,7 +38,6 @@ x = [0] * ysize
 for i in range (ysize): 
  x[i] = i 
 
-plt.plot(x,y)
 
 a = np.asarray(x)
 b = np.asarray(y)
