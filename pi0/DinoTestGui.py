@@ -9,7 +9,8 @@ from guizero import App, Text
 from guizero import PushButton
 import os
 import csv
-import matplotlib.pyplot as plt
+import glob
+#import matplotlib.pyplot as plt
 
 
 app = App(title="DinoLab Tester")
@@ -28,7 +29,10 @@ def test_camera():
 def test_spectrometer():
   print("Testing the Spectrometer")
   os.system("sudo python3 test.py DinoSpectrometer")
-
+  spectrum_files = glob.glob ("*.csv")
+  last_spectrum_file = max(spectrum_files,key = os.path.getctime)
+  print (last_spectrum_file)
+  os.system("sudo python DinoSpectrograph.py " + last_spectrum_file)
 
 def test_heater():
   print("Testing the Heater")
@@ -42,11 +46,8 @@ def test_serial():
 def test_simulation():
   print("Testing the Serial Port")
   os.system("sudo python3 test.py DinoSim")
-
-
-
-
-
+  
+ 
 button1 = PushButton(app, command=test_spectrometer, text="Spectrometer")
 button2 = PushButton(app, command=test_camera, text="Camera      ")
 button3 = PushButton(app, command=test_servo, text="Servo       ")
