@@ -32,11 +32,14 @@ y = np.loadtxt(fileName,
                   delimiter = ' ')
 
 ysize = len(y) 
-
+file = open("offset.txt", "r")
+str_offset = file.read()
+print(str_offset)
+file.close()
 i = 0
 x = [0] * ysize
 for i in range (ysize): 
- x[i] = i 
+ x[i] = i + int(str_offset) 
 
 
 a = np.asarray(x)
