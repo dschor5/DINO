@@ -10,6 +10,7 @@ from guizero import PushButton
 import os
 import csv
 import glob
+import os.path
 
 #import matplotlib.pyplot as plt
 
@@ -49,7 +50,11 @@ def test_calibrate():
   if(wavelength.get() == "" or wavelength.get() == "wavelength"):
      warn("Error", "Enter a valid Wavelength")
      return
-  print (wavelength.get())
+  wavelength_= wavelength.get() 
+  print (wavelength_)
+  file = open("calib_wavelength.txt", "w")
+  file.write(wavelength_)
+  file.close()
   os.system("sudo python3 test.py DinoSpectrometer")
   spectrum_files = glob.glob ("*.csv")
   last_spectrum_file = max(spectrum_files,key = os.path.getctime)
@@ -62,8 +67,15 @@ def test_simulation():
   print("Testing the Serial Port")
   os.system("sudo python3 test.py DinoSim")
   
+if(os.path.isfile("calib_wavelength.txt")):  
+ file = open("calib_wavelength.txt", "r")
+ calib_wavelength_ = file.read()
+ wavelength = TextBox(app,text = calib_wavelength_)
+ file.close()
+else:   
+ wavelength = TextBox(app,text = "wavelength")
+ 
 button1 = PushButton(app, command=test_calibrate, text="Calibrate")
-wavelength = TextBox(app,text = "wavelength")
 button2 = PushButton(app, command=test_spectrometer, text="Spectrometer")
 button3 = PushButton(app, command=test_camera, text="Camera      ")
 button4 = PushButton(app, command=test_servo, text="Servo       ")
