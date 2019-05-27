@@ -65,12 +65,14 @@ NR_STATE_COAST_END   = 6   # F  This state indicates the end of microgravity ope
                            #    cease logging data at this time.
 NR_STATE_UNDER_CHUTE = 7   # G  This state indicates that drogue parachutes have 
                            #    deployed and the capsule is in its final descent.
-NR_STATE_LANDING     = 8   # H  This state occurs after capsule touchdown.
-NR_STATE_SAFING      = 9   # I  After touchdown, this state indicates that the 
-                           #    capsule is venting and safing all energetic systems.
-NR_STATE_FINISHED    = 10  # J  This state is only ever reached in simulation and 
-                           #    indicates the end of the logged flight data.
-   
+NR_STATE_COST_END    = 8   # H  This event indicates the end of microgravity operations onboard the capsule, as 
+                           #    it begins to experience atmospheric acceleration. Most experiments cease logging 
+                           #    data at this time.
+NR_STATE_DROGUE_CHUTES = 9 # I  This event indicates that the drogue parachutes have been commanded to deploy. 
+                           
+NR_STATE_MAIN_CHUTES  = 10 # J  This event indicates that the main parachutes have been commanded to deploy. 
+                           
+NR_STATE_TOUCHDOWN   = 11  # K  This event indicates that the CC has detected touchdown (landing).   
 NR_STATE_SAFING .    = 12  # L  After touchdown, this event indicates that the CC has started performing its post-flight
                            #    safing procedure, following touchdown. NanoLabs may choose to use the safing flight event 
                            #    to stop data logging after touchdown.   
