@@ -57,13 +57,15 @@ NR_STATE_SEPARATION  = 3   # C  This state occurs after the rocket and capsule
 NR_STATE_COAST_START = 4  # D  This state indicates the beginning of the cleanest 
                            #    microgravity operations onboard the capsule, 
                            #    most experiments should begin logging data at this time.
-NR_STATE_APOGEE      = 5   # E  This state occurs when the vehicle has reached its 
-                           #    maximum altitude and begins to descend.
-NR_STATE_COAST_END   = 6   # F  This state indicates the end of microgravity operations 
-                           #    onboard the capsule, as we begin to experience 
-                           #    atmospheric accelerations. Many experiments will 
-                           #    cease logging data at this time.
-NR_STATE_UNDER_CHUTE = 7   # G  This state indicates that drogue parachutes have 
+NR_STATE_SEPARATION_CM = 5 # E  This event occurs after the rocket and capsule are commanded to separate, shortly before the
+                           # .  microgravity portion of the flight begins. The accelerations felt immediately following separation, caused by CC attitude control thrusters firing to null CC body angular rates, may exceed the micro-gravity limits (< 0.1g). Experiments dependent on prolonged, quiescent micro-gravity should 
+                           # .  not use separation as the triggering flight event, since thruster firing occurs for a period 
+                           # .  of time following separation.
+                           
+NR_STATE_COAST_START = 6   # F  This event indicates the beginning of the cleanest microgravity operations onboard 
+                           #    the capsule. Most experiments should begin logging data at this time.     
+                       
+NR_STATE_APOGEE = 7        # G  This state indicates that drogue parachutes have 
                            #    deployed and the capsule is in its final descent.
 NR_STATE_COST_END    = 8   # H  This event indicates the end of microgravity operations onboard the capsule, as 
                            #    it begins to experience atmospheric acceleration. Most experiments cease logging 
