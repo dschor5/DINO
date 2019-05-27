@@ -70,7 +70,7 @@ NR_STATE_SAFING      = 9   # I  After touchdown, this state indicates that the
                            #    capsule is venting and safing all energetic systems.
 NR_STATE_FINISHED    = 10  # J  This state is only ever reached in simulation and 
                            #    indicates the end of the logged flight data.
-NR_STATE_LETTERS = "@ABCDEFGHIJ"  
+NR_STATE_LETTERS = "@ABCDEFGHIJKLM"  
 
 
 class DinoSerial(object):
