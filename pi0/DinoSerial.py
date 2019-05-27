@@ -54,9 +54,12 @@ NR_STATE_MECO        = 2   # B  This state is triggered after the rocket's main 
 NR_STATE_SEPARATION  = 3   # C  This state occurs after the rocket and capsule 
                            #    separate, shortly before the microgravity 
                            #    portion of the flight begins.
-NR_STATE_COAST_START = 4  # D  This state indicates the beginning of the cleanest 
-                           #    microgravity operations onboard the capsule, 
-                           #    most experiments should begin logging data at this time.
+NR_STATE_MECO = 4          # D  This event is triggered after the propulsion module’s rocket engine is shut down. MECO occurs
+                           #    during ascent, right before the CC and primary module separate. Although the sensed acceleration 
+                           #    immediately following MECO may be within the micro-gravity limits (< 0.1g), experiments dependent 
+                           #    on prolonged, quiescent micro-gravity should not use MECO as the triggering flight event 
+                           #    unless they can tolerate a short high impulse event after the trigger and before the 
+                           #    prolonged microgravity period. 
 NR_STATE_SEPARATION_CM = 5 # E  This event occurs after the rocket and capsule are commanded to separate, shortly before the
                            # .  microgravity portion of the flight begins. The accelerations felt immediately following separation, caused by CC attitude control thrusters firing to null CC body angular rates, may exceed the micro-gravity limits (< 0.1g). Experiments dependent on prolonged, quiescent micro-gravity should 
                            # .  not use separation as the triggering flight event, since thruster firing occurs for a period 
