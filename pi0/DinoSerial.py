@@ -47,13 +47,17 @@ NR_SIZE            = 21
 # From: NR-BLUE-W0001 (RevA) Feather Frame Payload User's Guide (002).pdf
 NR_STATE_NONE        = 0   # @  No flight state has been reached yet 
                            #    (typically the time prior to liftoff).
-NR_STATE_LIFTOFF     = 1   # A  This state is triggered once sensed acceleration 
-                           #    first changes due to engine ignition.
-NR_STATE_MECO        = 2   # B  This state is triggered after the rocket's main engine 
-                           #    cuts out, and the flight enters its coast stage.
-NR_STATE_SEPARATION  = 3   # C  This state occurs after the rocket and capsule 
-                           #    separate, shortly before the microgravity 
-                           #    portion of the flight begins.
+NR_STATE_ESCAPE_EN   = 1   # A  This event is triggered when the emergency escape solid rocket motor is enabled on the CC. 
+                           #    This is a nominal event that occurs before liftoff. If an anomaly on the vehicle is detected
+                           #    any time after this, the CC may ignite the solid rocket motor and escape rapidly from the 
+                           #    propulsion module. 
+                          
+NR_STATE_ESCAPE_CMD  = 2   # B  This event is triggered when the emergency escape system has been commanded to perform the 
+                           #    escape maneuver. This event is not reached during a nominal flight, but may be used by 
+                           #    NanoLabs as a way of aborting already started experiments or preventing them from starting. 
+                               
+NR_STATE_LIFTOFF     = 3   # C  This event is triggered once the vertical velocity exceeds a set threshold. 
+                               
 NR_STATE_MECO = 4          # D  This event is triggered after the propulsion module’s rocket engine is shut down. MECO occurs
                            #    during ascent, right before the CC and primary module separate. Although the sensed acceleration 
                            #    immediately following MECO may be within the micro-gravity limits (< 0.1g), experiments dependent 
@@ -61,7 +65,8 @@ NR_STATE_MECO = 4          # D  This event is triggered after the propulsion mod
                            #    unless they can tolerate a short high impulse event after the trigger and before the 
                            #    prolonged microgravity period. 
 NR_STATE_SEPARATION_CM = 5 # E  This event occurs after the rocket and capsule are commanded to separate, shortly before the
-                           # .  microgravity portion of the flight begins. The accelerations felt immediately following separation, caused by CC attitude control thrusters firing to null CC body angular rates, may exceed the micro-gravity limits (< 0.1g). Experiments dependent on prolonged, quiescent micro-gravity should 
+                           # .  microgravity portion of the flight begins. The accelerations felt immediately following separation, caused by CC attitude control thrusters firing to null CC body angular 
+                           #    rates, may exceed the micro-gravity limits (< 0.1g). Experiments dependent on prolonged, quiescent micro-gravity should 
                            # .  not use separation as the triggering flight event, since thruster firing occurs for a period 
                            # .  of time following separation.
                            
