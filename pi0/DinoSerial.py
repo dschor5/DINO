@@ -70,6 +70,10 @@ NR_STATE_SAFING      = 9   # I  After touchdown, this state indicates that the
                            #    capsule is venting and safing all energetic systems.
 NR_STATE_FINISHED    = 10  # J  This state is only ever reached in simulation and 
                            #    indicates the end of the logged flight data.
+   
+NR_STATE_SAFING .    = 12  # L  After touchdown, this event indicates that the CC has started performing its post-flight
+                           #    safing procedure, following touchdown. NanoLabs may choose to use the safing flight event 
+                           #    to stop data logging after touchdown.   
 NR_STATE_MISSION_END = 13  # M  Mission End: ‘M’ = This event is triggered once the CC has finished performing 
                            #    its post-flight safing procedure. This is the last flight event that NanoLabs can
                            #    use to close out their experiments prior to being powered down. It is recommended 
