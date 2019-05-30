@@ -30,14 +30,17 @@ DINO_STATE_EXPERIMENT = 2
 DINO_STATE_END_EXP    = 3
 DINO_STATE_FINISHED   = 4
 
-FLIGHT_DATA = {'flight_state': 0, 
+
+FLIGHT_DATA = {'flight_event': 0, 
                 'exptime': 0,
                 'altitude': 0,
+                'gps_altitude': 0,
                 'velocity': [0,0,0],
+                'acc_magnitude': 0,
                 'acceleration': [0,0,0],
                 'attitude': [0,0,0],
                 'angular_velocity': [0,0,0],
-                'warnings': [0,0,0,0,0,0]}
+                'warnings': [0,0,0,0]}
 
 class DinoMain(object):
 
@@ -87,14 +90,14 @@ class DinoMain(object):
       Store a tuple of sensor readings with "False" 
       for any fields that could not be read.
       """
-      flight_state = FLIGHT_DATA['flight_state']#self._dinoSerial.readData()
+      flight_event = FLIGHT_DATA['flight_event']#self._dinoSerial.readData()
       flight_altitude = FLIGHT_DATA['altitude']
       flight_acceleration = FLIGHT_DATA['acceleration']
       tempEnv    = self._dinoEnv.readData()
       #print('flight_state =')
       #print(flight_state)
 
-      self._data[I_FLIGHT_STATE]    = flight_state #tempSerial[NR_FLIGHT_STATE]
+      self._data[I_FLIGHT_STATE]    = flight_event#tempSerial[NR_FLIGHT_STATE]
       self._data[I_ALTITUDE]        = flight_altitude #tempSerial[NR_ALTITUDE]
       self._data[I_ACCELERATION]    = flight_acceleration #tempSerial[NR_ACCELERATION]
       self._data[I_LIGHT_RED]       = tempEnv[ENV_HAT_LIGHT_RED]
@@ -106,11 +109,11 @@ class DinoMain(object):
       self._data[I_ACCEL_X]         = tempEnv[ENV_HAT_ACCEL_X]
       self._data[I_ACCEL_Y]         = tempEnv[ENV_HAT_ACCEL_Y]
       self._data[I_ACCEL_Z]         = tempEnv[ENV_HAT_ACCEL_Z]
-      
-   def parse_serial_packet(self,incoming_data):
+    
+   def parse_serial_packet(self, incoming_data):
     # Remove leading or trailing white space and separate the fields.
     incoming_data = incoming_data.strip()
-    fields = incoming_data.split(b',')
+    fields = incoming_data.split(',')
 
     # Ensure that the appropriate number of data fields are present.
     if len(fields) != NUMDATAFIELDS:
@@ -119,49 +122,52 @@ class DinoMain(object):
         index = 0
         for field in fields:
             if index == 0:
-                FLIGHT_DATA['flight_state'] = field 
+                FLIGHT_DATA['flight_event'] = field
             elif index == 1:
                 FLIGHT_DATA['exptime'] = float(field)
             elif index == 2:
                 FLIGHT_DATA['altitude'] = float(field)
             elif index == 3:
-                FLIGHT_DATA['velocity'][0] = float(field)
+                FLIGHT_DATA['gps_altitude'] = float(field)
             elif index == 4:
-                FLIGHT_DATA['velocity'][1] = float(field)
+                FLIGHT_DATA['velocity'][0] = float(field)
             elif index == 5:
-                FLIGHT_DATA['velocity'][2] = float(field)
+                FLIGHT_DATA['velocity'][1] = float(field)
             elif index == 6:
-                FLIGHT_DATA['acceleration'][0] = float(field)
+                FLIGHT_DATA['velocity'][2] = float(field)
             elif index == 7:
-                FLIGHT_DATA['acceleration'][1] = float(field)
+                FLIGHT_DATA['acc_magnitude'] = float(field)
             elif index == 8:
-                FLIGHT_DATA['acceleration'][2] = float(field)
+                FLIGHT_DATA['acceleration'][0] = float(field)
             elif index == 9:
-                FLIGHT_DATA['attitude'][0] = float(field)
+                FLIGHT_DATA['acceleration'][1] = float(field)
             elif index == 10:
-                FLIGHT_DATA['attitude'][1] = float(field)
+                FLIGHT_DATA['acceleration'][2] = float(field)
             elif index == 11:
-                FLIGHT_DATA['attitude'][2] = float(field)
+                FLIGHT_DATA['attitude'][0] = float(field)
             elif index == 12:
-                FLIGHT_DATA['angular_velocity'][0] = float(field)
+                FLIGHT_DATA['attitude'][1] = float(field)
             elif index == 13:
-                FLIGHT_DATA['angular_velocity'][1] = float(field)
+                FLIGHT_DATA['attitude'][2] = float(field)
             elif index == 14:
-                FLIGHT_DATA['angular_velocity'][2] = float(field)
+                FLIGHT_DATA['angular_velocity'][0] = float(field)
             elif index == 15:
-                FLIGHT_DATA['warnings'][0] = int(field)
+                FLIGHT_DATA['angular_velocity'][1] = float(field)
             elif index == 16:
-                FLIGHT_DATA['warnings'][1] = int(field)
+                FLIGHT_DATA['angular_velocity'][2] = float(field)
             elif index == 17:
-                FLIGHT_DATA['warnings'][2] = int(field)
+                FLIGHT_DATA['warnings'][0] = int(field)
             elif index == 18:
-                FLIGHT_DATA['warnings'][3] = int(field)
+                FLIGHT_DATA['warnings'][1] = int(field)
             elif index == 19:
-                FLIGHT_DATA['warnings'][4] = int(field)
+                FLIGHT_DATA['warnings'][2] = int(field)
             elif index == 20:
-                FLIGHT_DATA['warnings'][5] = int(field)
+                FLIGHT_DATA['warnings'][3] = int(field)
             index = index + 1
         return True
+    
+    
+  
    def _determineState(self):
       """
       Determine the state of the experiment.
@@ -171,7 +177,7 @@ class DinoMain(object):
       
       
       # Logic to determine the current experiment state
-      strState = self._data[I_FLIGHT_STATE].decode('utf-8')
+      strState = self._data[I_FLIGHT_STATE]
       nrState = NR_STATE_LETTERS.index(strState)
       #print('strState = ',strState)
       
@@ -180,13 +186,13 @@ class DinoMain(object):
          self._currState = DINO_STATE_INIT
          
          
-      elif(nrState < NR_STATE_UNDER_CHUTE):
+      elif(nrState < NR_STATE_DROGUE_CHUTES):
          if(self._currState == DINO_STATE_INIT):
             self._currState = DINO_STATE_START_EXP
          else:
             self._currState = DINO_STATE_EXPERIMENT
             
-      elif(nrState < NR_STATE_LANDING):
+      elif(nrState < NR_STATE_TOUCHDOWN):
          self._currState = DINO_STATE_END_EXP    
          
       else:
@@ -251,7 +257,7 @@ class DinoMain(object):
             continue
 
         # Check that packet was well formatted.
-         if not self.parse_serial_packet(data_in):
+         if not self.parse_serial_packet(data_in.decode('utf-8')):
             continue
         
          print(data_in)
