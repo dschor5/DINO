@@ -83,7 +83,7 @@ NR_STATE_DROGUE_CHUTES = 9 # I  This event indicates that the drogue parachutes 
 NR_STATE_MAIN_CHUTES  = 10 # J  This event indicates that the main parachutes have been commanded to deploy. 
                            
 NR_STATE_TOUCHDOWN   = 11  # K  This event indicates that the CC has detected touchdown (landing).   
-NR_STATE_SAFING .    = 12  # L  After touchdown, this event indicates that the CC has started performing its post-flight
+NR_STATE_SAFING      = 12  # L  After touchdown, this event indicates that the CC has started performing its post-flight
                            #    safing procedure, following touchdown. NanoLabs may choose to use the safing flight event 
                            #    to stop data logging after touchdown.   
 NR_STATE_MISSION_END = 13  # M  Mission End: ‘M’ = This event is triggered once the CC has finished performing 
