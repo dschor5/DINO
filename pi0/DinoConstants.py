@@ -22,6 +22,9 @@ CAMERA_REC_DURATION = 30.0
 # Servo agitation interval in seconds
 SERVO_AGITATION_INTERVAL = 4.0
 
+# Spectrometer capture interval in seconds
+SPECTROMETER_CAPTURE_INTERVAL = 40.0
+
 # Colors for printing output using ANSI escape sequences. 
 # From: http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
 COLORS = {
