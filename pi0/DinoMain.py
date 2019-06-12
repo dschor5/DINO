@@ -80,6 +80,7 @@ class DinoMain(object):
 
          # Flag to terminate the test
          DinoMain._endTest     = False
+         DinoMain._dinoServo.stopServo()
 
       return DinoMain.__instance
 
@@ -178,21 +179,26 @@ class DinoMain(object):
       
       # Logic to determine the current experiment state
       strState = self._data[I_FLIGHT_STATE]
-      nrState = NR_STATE_LETTERS.index(strState)
+      try:
+       nrState = NR_STATE_LETTERS.index(strState)
+      except:
+        DinoLog.logMsg("Errpr in Conversion to String")
+        return self._prevState
+
       #print('strState = ',strState)
       
       
-      if(nrState < NR_STATE_MECO):
+      if(nrState < NR_STATE_COAST_START):          #NR_STATE_MECO
          self._currState = DINO_STATE_INIT
+         DinoMain._dinoServo.stopServo()
          
-         
-      elif(nrState < NR_STATE_DROGUE_CHUTES):
+      elif(nrState < NR_STATE_COAST_END):          #NR_STATE_DROGUE_CHUTES
          if(self._currState == DINO_STATE_INIT):
             self._currState = DINO_STATE_START_EXP
          else:
             self._currState = DINO_STATE_EXPERIMENT
             
-      elif(nrState < NR_STATE_TOUCHDOWN):
+      elif(nrState < NR_STATE_TOUCHDOWN):  
          self._currState = DINO_STATE_END_EXP    
          
       else:
@@ -257,8 +263,12 @@ class DinoMain(object):
             continue
 
         # Check that packet was well formatted.
-         if not self.parse_serial_packet(data_in.decode('utf-8')):
+         try:
+          if not self.parse_serial_packet(data_in.decode('utf-8')):
             continue
+         except:
+             DinoLog.logMsg("ERROR - Could not decode serial data.")
+             pass
         
          print(data_in)
          self._readAllData()
@@ -274,9 +284,9 @@ class DinoMain(object):
             
          elif(self._currState == DINO_STATE_START_EXP):
             self._dinoCamera.startRecording(duration=CAMERA_REC_DURATION)
-            self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
-            #TODO Turn on spectrometer captures
-            self._dinoSpectrometer.captureSpectrum()
+            #self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
+            self._dinoSpectrometer.startCapturing(SPECTROMETER_CAPTURE_INTERVAL)
+
             
          elif(self._currState == DINO_STATE_EXPERIMENT):
             pass
@@ -284,7 +294,7 @@ class DinoMain(object):
          elif(self._currState == DINO_STATE_END_EXP):
             self._dinoCamera.stopRecording()
             self._dinoServo.stopServo()
-            #TODO Turn off spectrometer captures            
+            self._dinoSpectrometer.stopCapturing()
                         
          else:
             self._endTest = True
