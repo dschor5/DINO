@@ -61,9 +61,11 @@ class DinoMain(object):
          DinoMain._dinoCamera  = DinoCamera("video")
          DinoMain._dinoEnv     = DinoEnvirophat()
          DinoMain._dinoThermal = DinoThermalControl(HEATER_PIN, COOLER_PIN)
-         DinoMain._dinoServo   = DinoServo(SERVO_PIN)
          DinoMain._dinoSerial  = DinoSerial('/dev/serial0')
          DinoMain._dinoSpectrometer = DinoSpectrometer()
+         DinoMain._dinoServo   = DinoServo(SERVO_PIN)
+         DinoMain._dinoServo.hardStopServo()
+
 
          #initialize the spectrometer
          DinoMain._dinoSpectrometer.initialize()
@@ -80,7 +82,7 @@ class DinoMain(object):
 
          # Flag to terminate the test
          DinoMain._endTest     = False
-         DinoMain._dinoServo.stopServo()
+
 
       return DinoMain.__instance
 
@@ -190,7 +192,6 @@ class DinoMain(object):
       
       if(nrState < NR_STATE_COAST_START):          #NR_STATE_MECO
          self._currState = DINO_STATE_INIT
-         DinoMain._dinoServo.stopServo()
          
       elif(nrState < NR_STATE_COAST_END):          #NR_STATE_DROGUE_CHUTES
          if(self._currState == DINO_STATE_INIT):
@@ -258,8 +259,10 @@ class DinoMain(object):
          #print("Reading the USB serial port")
          #Read all sensor data and serial data
          data_in = ser.read(MAXBUFFER)
-         
+
          if (len(data_in) == 0):
+            #print("Waiting For Serial Data")
+            #self._dinoServo.hardStopServo()
             continue
 
         # Check that packet was well formatted.
@@ -268,7 +271,7 @@ class DinoMain(object):
             continue
          except:
              DinoLog.logMsg("ERROR - Could not decode serial data.")
-             pass
+             continue
         
          print(data_in)
          self._readAllData()
@@ -281,10 +284,11 @@ class DinoMain(object):
 
          if(self._currState == DINO_STATE_INIT):
             pass
-            
+
          elif(self._currState == DINO_STATE_START_EXP):
+            self._dinoServo.restartServo()
             self._dinoCamera.startRecording(duration=CAMERA_REC_DURATION)
-            #self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
+            self._dinoServo.startServo(SERVO_AGITATION_INTERVAL)
             self._dinoSpectrometer.startCapturing(SPECTROMETER_CAPTURE_INTERVAL)
 
             
@@ -292,13 +296,16 @@ class DinoMain(object):
             pass
             
          elif(self._currState == DINO_STATE_END_EXP):
+            #stop the servo low level oscillation
+            self._dinoServo.hardStopServo()
+            #stop the threads
             self._dinoCamera.stopRecording()
             self._dinoServo.stopServo()
             self._dinoSpectrometer.stopCapturing()
                         
          else:
             self._endTest = True
-            
+            self._dinoServo.stopServo()
 
          
          # Sleep for 0.05sec. By the time it wakes up, 
