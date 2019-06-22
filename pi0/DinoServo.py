@@ -11,6 +11,10 @@ try:
 except:
    print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - Servo library not loaded.")
 
+try:
+   from gpiozero   import LED
+except:
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - LED library not loaded.")
 
 class DinoServo(object):
 
@@ -47,8 +51,9 @@ class DinoServo(object):
          except:
             DinoLog.logMsg("ERROR - Could not create event for servo.")
 
-         # Create PiCamera object.
-         # Change configuration parameters as needed for the 
+         # Create a Servo object.
+         # Change configuration parameters as needed for the
+
          try:
             DinoServo.__servo = Servo(servoPin, \
                initial_value   = 0, \
@@ -58,6 +63,7 @@ class DinoServo(object):
          except:
             DinoServo.__servo = None
             DinoLog.logMsg("ERROR - Could not create Servo() object.")
+            DinoServo.__servo.stop()
       return DinoServo.__instance
 
 
@@ -115,6 +121,18 @@ class DinoServo(object):
          status = False
       return status
 
+   def hardStopServo(self):
+      try:
+       self.__servo.detach()
+      except:
+       print("failed to stop servo")
+
+   def restartServo(self):
+    try:
+      self.__servo.value = 1
+      self.__servo.min()
+    except:
+       print("failed to start servo")
 
    def stopServo(self):
       """ 
@@ -174,9 +192,11 @@ class DinoServo(object):
                faultFound = True
             elif(self.__servo.value > 0):
                self.__servo.min()
+               print("Servo moved to min position.")
                #DinoLog.logMsg("Servo moved to min position.")
             else:
-               self.__servo.max()            
+               self.__servo.max()
+               print("Servo moved to max position.")
                #DinoLog.logMsg("Servo moved to max position.")
                
          except:
