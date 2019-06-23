@@ -125,14 +125,14 @@ class DinoServo(object):
       try:
        self.__servo.detach()
       except:
-       print("failed to stop servo")
+       DinoLog.logMsg("ERROR - Could not stop servo motor")
 
    def restartServo(self):
     try:
       self.__servo.value = 1
       self.__servo.min()
     except:
-       print("failed to start servo")
+       DinoLog.logMsg("ERROR - Could not restart servo motor")
 
    def stopServo(self):
       """ 

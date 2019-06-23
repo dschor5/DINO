@@ -252,17 +252,19 @@ class DinoMain(object):
          self._dinoThermal.setCoolerState(False)
    
       return True
+
    def run(self):
       ser = serial.Serial(port=PORTNAME, baudrate=BAUDRATE, timeout=TIMEOUT)
       #self._dinoSerial.openSerialPort()
       while(self._endTest == False):
          #print("Reading the USB serial port")
          #Read all sensor data and serial data
+         currMet = DinoTime.getMET()
          data_in = ser.read(MAXBUFFER)
 
          if (len(data_in) == 0):
             #print("Waiting For Serial Data")
-            #self._dinoServo.hardStopServo()
+            print(currMet)
             continue
 
         # Check that packet was well formatted.

@@ -16,6 +16,16 @@ SERVO_PIN  = 18
 HEATER_PIN = 16
 COOLER_PIN = 12
 
+#number of seconds after power is applied to the Dino and before ignition
+POWER_TO_DINO_BEFORE_IGNITION = 300.00
+
+#Mission events happening and their number of seconds after ignition
+
+MAIN_ENGIN_IGNITION_EVENT = 0
+LIFT_OFF_EVENT = 7.0
+COST_START_EVENT = 177.0
+COST_END_EVENT = 348.0
+
 # Camera recording duration in seconds
 CAMERA_REC_DURATION = 30.0
 
@@ -23,7 +33,7 @@ CAMERA_REC_DURATION = 30.0
 SERVO_AGITATION_INTERVAL = 4.0
 
 # Spectrometer capture interval in seconds
-SPECTROMETER_CAPTURE_INTERVAL = 40.0
+SPECTROMETER_CAPTURE_INTERVAL = 10.0
 
 # Colors for printing output using ANSI escape sequences. 
 # From: http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
