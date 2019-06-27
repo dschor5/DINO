@@ -16,6 +16,12 @@ from DinoThermalControl import *  # GPIO interface for heater and cooler
 from DinoSpectrometer   import *  # Spectrometer interface
 
 
+try:
+   from gpiozero   import CPUTemperature        # CPU Temperature interface
+except:
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - CPU Temperature gpiozero not loaded.")
+
+
 THERMAL_CONTROL_PERIOD = 10 # Unit: 1/10 sec 
 MAXBUFFER = 200
 NUMDATAFIELDS = 21
@@ -230,14 +236,36 @@ class DinoMain(object):
       else:
          self._thermalCount = self._thermalCount + 1
          return False
-      
+
       # Determine temperature
+
       if(self._data[I_TEMPERATURE] is not None):
+         # Read temperature from EnviroPHat
          temperature = self._data[I_TEMPERATURE]
+
       elif(self._data[I_ALTITUDE] is not None):
-         temperature = 0 #TODO
+
+         # Convert altitude to meters
+         altitudeInMeters = self._data[I_ALTITUDE] * FEET_TO_METER
+
+         # Compute the temperature based on the altitude
+
+         # Troposphere
+         if(altitudeInMeters < MAX_ALTITUDE_TROPOSPHERE):     
+            temperature = TROPOSPHERE_OFFSET        + TROPOSPHERE_GAIN * altitudeInMeters
+
+         # Lower stratosphere
+         elif(altitudeInMeters < MAX_ALTITUDE_LOWER_STRATOSPHERE):  
+            temperature = LOWER_STRATOSPHERE_OFFSET + LOWER_STRATOSPHERE_GAIN * altitudeInMeters
+
+         # Upper stratosphere
+         else:                            
+            temperature = UPPER_STRATOSPHERE_OFFSET + UPPER_STRATOSPHERE_GAIN * altitudeInMeters
+
       else:
-         temperature = 0 #TODO
+         # Read CPU temperature and use that as an approximation
+         cpu = CPUTemperature()
+         temperature = cpu.temperature + CPU_TEMP_OFFSET
 
       # Control heater
       if(temperature < TURN_ON_HEATER):

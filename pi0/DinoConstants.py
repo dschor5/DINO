@@ -10,21 +10,43 @@ TURN_OFF_HEATER = 21.1 # Celsius. Equivalent to 70.0F.
 TURN_ON_COOLER  = 25.8 # Celsius. Equivalent to 78.5F.
 TURN_OFF_COOLER = 18.3 # Celsius. Equivalent to 65.0F.
 
+# Conversion from feet to meters 
+# From https://www.metric-conversions.org/length/feet-to-meters.htm
+FEET_TO_METER = 0.3048
+
+# Constants for altitude to temperature conversion
+# From https://www.grc.nasa.gov/www/k-12/airplane/atmosmet.html
+MAX_ALTITUDE_TROPOSPHERE = 11000        # meters
+MAX_ALTITUDE_LOWER_STRATOSPHERE = 25000 # meters
+MIN_ALTITUDE_UPPER_STRATOSPHERE = 25000 # meters
+TROPOSPHERE_OFFSET        = 15.04       # Celsius
+TROPOSPHERE_GAIN          = -0.00649    # Celsius / meter
+LOWER_STRATOSPHERE_OFFSET = -55.46      # Celsius
+LOWER_STRATOSPHERE_GAIN   = 0           # Celsius / meter
+UPPER_STRATOSPHERE_OFFSET = -131.21     # Celsius
+UPPER_STRATOSPHERE_GAIN   = 0.00299     # Celsius / meter
+
+# CPU Temperature offset. 
+# Generally, CPU temperature is higher than the ambient temperature 
+# around it due to heat dissipation from the electronic circuits. 
+# I could not find an estimate of what that offset would be, so 
+# for now, we can define that as zero as a placeholder. 
+CPU_TEMP_OFFSET = 0 # Celsius
+
 # GPIO Pin numbers
 # From: Terry's email.
 SERVO_PIN  = 18
 HEATER_PIN = 16
 COOLER_PIN = 12
 
-#number of seconds after power is applied to the Dino and before ignition
+# Number of seconds after power is applied to the Dino and before ignition
 POWER_TO_DINO_BEFORE_IGNITION = 300.00
 
-#Mission events happening and their number of seconds after ignition
-
-MAIN_ENGIN_IGNITION_EVENT = 0
-LIFT_OFF_EVENT = 7.0
-COST_START_EVENT = 177.0
-COST_END_EVENT = 348.0
+# Mission events happening and their number of seconds after ignition
+MAIN_ENGIN_IGNITION_EVENT = 0       # sec
+LIFT_OFF_EVENT            = 7.0     # sec
+COST_START_EVENT          = 177.0   # sec
+COST_END_EVENT            = 348.0   # sec
 
 # Camera recording duration in seconds
 CAMERA_REC_DURATION = 30.0
