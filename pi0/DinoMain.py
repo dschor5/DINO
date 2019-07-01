@@ -16,12 +16,6 @@ from DinoThermalControl import *  # GPIO interface for heater and cooler
 from DinoSpectrometer   import *  # Spectrometer interface
 
 
-try:
-   from gpiozero   import CPUTemperature        # CPU Temperature interface
-except:
-   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - CPU Temperature gpiozero not loaded.")
-
-
 THERMAL_CONTROL_PERIOD = 10 # Unit: 1/10 sec 
 MAXBUFFER = 200
 NUMDATAFIELDS = 21
@@ -236,49 +230,50 @@ class DinoMain(object):
       else:
          self._thermalCount = self._thermalCount + 1
          return False
-
+      
       # Determine temperature
 
       if(self._data[I_TEMPERATURE] is not None):
          # Read temperature from EnviroPHat
          temperature = self._data[I_TEMPERATURE]
-
+         #temperature = TURN_ON_HEATER - 10 #test
+         print("temperature = ", temperature)
       elif(self._data[I_ALTITUDE] is not None):
 
          # Convert altitude to meters
          altitudeInMeters = self._data[I_ALTITUDE] * FEET_TO_METER
 
          # Compute the temperature based on the altitude
-
+         print("Altitude = ", altitudeInMeters)
          # Troposphere
-         if(altitudeInMeters < MAX_ALTITUDE_TROPOSPHERE):     
-            temperature = TROPOSPHERE_OFFSET        + TROPOSPHERE_GAIN * altitudeInMeters
+         if(altitudeInMeters < MAX_ALTITUDE_TROPOSPHERE):
+            temperature = TROPOSPHERE_OFFSET + TROPOSPHERE_GAIN * altitudeInMeters
 
          # Lower stratosphere
-         elif(altitudeInMeters < MAX_ALTITUDE_LOWER_STRATOSPHERE):  
+         elif(altitudeInMeters < MAX_ALTITUDE_LOWER_STRATOSPHERE):
             temperature = LOWER_STRATOSPHERE_OFFSET + LOWER_STRATOSPHERE_GAIN * altitudeInMeters
 
          # Upper stratosphere
-         else:                            
+         else:
             temperature = UPPER_STRATOSPHERE_OFFSET + UPPER_STRATOSPHERE_GAIN * altitudeInMeters
 
       else:
          # Read CPU temperature and use that as an approximation
          cpu = CPUTemperature()
          temperature = cpu.temperature + CPU_TEMP_OFFSET
-
+          
       # Control heater
       if(temperature < TURN_ON_HEATER):
          self._dinoThermal.setHeaterState(True)
       else:
          self._dinoThermal.setHeaterState(False)
-      
+
       # Control cooler
       if(temperature > TURN_ON_COOLER):
          self._dinoThermal.setCoolerState(True)
       else:
          self._dinoThermal.setCoolerState(False)
-   
+
       return True
 
    def run(self):
@@ -292,7 +287,7 @@ class DinoMain(object):
 
          if (len(data_in) == 0):
             #print("Waiting For Serial Data")
-            print(currMet)
+            #print(currMet)
             continue
 
         # Check that packet was well formatted.
@@ -303,7 +298,7 @@ class DinoMain(object):
              DinoLog.logMsg("ERROR - Could not decode serial data.")
              continue
         
-         print(data_in)
+         #print(data_in)
          self._readAllData()
          DinoLog.logData(self._data)
          # Determine experiment state
