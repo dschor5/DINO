@@ -36,8 +36,8 @@ CPU_TEMP_OFFSET = 0 # Celsius
 # GPIO Pin numbers
 # From: Terry's email.
 SERVO_PIN  = 18
-HEATER_PIN = 16
-COOLER_PIN = 12
+HEATER_PIN = 24
+COOLER_PIN = 23
 
 # Number of seconds after power is applied to the Dino and before ignition
 POWER_TO_DINO_BEFORE_IGNITION = 300.00
@@ -45,8 +45,8 @@ POWER_TO_DINO_BEFORE_IGNITION = 300.00
 # Mission events happening and their number of seconds after ignition
 MAIN_ENGIN_IGNITION_EVENT = 0       # sec
 LIFT_OFF_EVENT            = 7.0     # sec
-COST_START_EVENT          = 177.0   # sec
-COST_END_EVENT            = 348.0   # sec
+COAST_START_EVENT         = 177.0   # sec
+COAST_END_EVENT           = 348.0   # sec
 
 # Camera recording duration in seconds
 CAMERA_REC_DURATION = 30.0
