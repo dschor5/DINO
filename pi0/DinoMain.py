@@ -233,35 +233,49 @@ class DinoMain(object):
       
       # Determine temperature
 
-      if(self._data[I_TEMPERATURE] is not None):
+      if (self._data[I_TEMPERATURE] is not None):
          # Read temperature from EnviroPHat
          temperature = self._data[I_TEMPERATURE]
          #temperature = TURN_ON_HEATER - 10 #test
-         print("temperature = ", temperature)
+         print("EVPHAT:temperature = ", temperature)
       elif(self._data[I_ALTITUDE] is not None):
 
          # Convert altitude to meters
          altitudeInMeters = self._data[I_ALTITUDE] * FEET_TO_METER
 
          # Compute the temperature based on the altitude
-         print("Altitude = ", altitudeInMeters)
+
          # Troposphere
          if(altitudeInMeters < MAX_ALTITUDE_TROPOSPHERE):
             temperature = TROPOSPHERE_OFFSET + TROPOSPHERE_GAIN * altitudeInMeters
-
+            temperature = round(temperature,2)
+            altitudeInMeters = round(altitudeInMeters,2)
+            print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
          # Lower stratosphere
          elif(altitudeInMeters < MAX_ALTITUDE_LOWER_STRATOSPHERE):
             temperature = LOWER_STRATOSPHERE_OFFSET + LOWER_STRATOSPHERE_GAIN * altitudeInMeters
-
+            temperature = round(temperature,2)
+            altitudeInMeters = round(altitudeInMeters,2)
+            print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
          # Upper stratosphere
          else:
             temperature = UPPER_STRATOSPHERE_OFFSET + UPPER_STRATOSPHERE_GAIN * altitudeInMeters
-
+            temperature = round(temperature,2)
+            altitudeInMeters = round(altitudeInMeters,2)
+            print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
       else:
          # Read CPU temperature and use that as an approximation
+        try:
          cpu = CPUTemperature()
          temperature = cpu.temperature + CPU_TEMP_OFFSET
-          
+         temperature = round(temperature,2)
+         altitudeInMeters = round(altitudeInMeters,2)
+         print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
+        except:
+         DinoLog.logMsg("ERROR - Could Read CPU Temperature.")
+         print("Could not read CPU temperature")
+
+
       # Control heater
       if(temperature < TURN_ON_HEATER):
          self._dinoThermal.setHeaterState(True)
@@ -282,6 +296,14 @@ class DinoMain(object):
       while(self._endTest == False):
          #print("Reading the USB serial port")
          #Read all sensor data and serial data
+
+          # Run thermal algorithm
+        try:
+         self._runThermalControl()  #need to run thermal control even before communication with NRFF
+        except:
+         DinoLog.logMsg("ERROR - Could Read Temperature.")
+         print("Could not read temperature")
+
          currMet = DinoTime.getMET()
          data_in = ser.read(MAXBUFFER)
 
@@ -305,7 +327,7 @@ class DinoMain(object):
          self._determineState()
 
          # Run thermal algorithm
-         self._runThermalControl()
+         #self._runThermalControl()
 
          if(self._currState == DINO_STATE_INIT):
             pass
