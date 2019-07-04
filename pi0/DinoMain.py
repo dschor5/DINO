@@ -15,6 +15,11 @@ from DinoSerial         import *  # Serial data interface
 from DinoThermalControl import *  # GPIO interface for heater and cooler
 from DinoSpectrometer   import *  # Spectrometer interface
 
+try:
+   from gpiozero   import CPUTemperature
+except:
+   print(COLORS['TEST_FAIL'] + "ERROR" + COLORS['NORMAL'] + " - CPUTemperature library not loaded.")
+
 
 THERMAL_CONTROL_PERIOD = 10 # Unit: 1/10 sec 
 MAXBUFFER = 200
