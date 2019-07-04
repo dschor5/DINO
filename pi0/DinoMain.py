@@ -291,9 +291,13 @@ class DinoMain(object):
       return True
 
    def run(self):
+    try:
       ser = serial.Serial(port=PORTNAME, baudrate=BAUDRATE, timeout=TIMEOUT)
+    except:
+      DinoLog.logMsg("ERROR - Failed To Open Serial Port.")
+      print("Failed To Open Serial Port")
       #self._dinoSerial.openSerialPort()
-      while(self._endTest == False):
+    while(self._endTest == False):
          #print("Reading the USB serial port")
          #Read all sensor data and serial data
 
@@ -301,15 +305,26 @@ class DinoMain(object):
         try:
          self._runThermalControl()  #need to run thermal control even before communication with NRFF
         except:
-         DinoLog.logMsg("ERROR - Could Read Temperature.")
-         print("Could not read temperature")
+         DinoLog.logMsg("ERROR - Failed Thermal Control.")
+         print("Failed Thermal Control")
 
-         currMet = DinoTime.getMET()
-         data_in = ser.read(MAXBUFFER)
+         try:
+          currMet = DinoTime.getMET()
+         except:
+           DinoLog.logMsg("ERROR - Could Not Read MET")
+           print("Could Not Read MET")
+
+         try:
+          data_in = ser.read(MAXBUFFER)
+         except:
+          DinoLog.logMsg("ERROR - Could Not Read Serial Port")
+          print("Could Not Read Serial Port")
 
          if (len(data_in) == 0):
             #print("Waiting For Serial Data")
             #print(currMet)
+            tempEnv    = self._dinoEnv.readData()
+            self._data[I_TEMPERATURE]     = tempEnv[ENV_HAT_TEMPERATURE]
             continue
 
         # Check that packet was well formatted.
