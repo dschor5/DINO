@@ -255,29 +255,28 @@ class DinoMain(object):
             temperature = TROPOSPHERE_OFFSET + TROPOSPHERE_GAIN * altitudeInMeters
             temperature = round(temperature,2)
             altitudeInMeters = round(altitudeInMeters,2)
-            print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
+            #print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
          # Lower stratosphere
          elif(altitudeInMeters < MAX_ALTITUDE_LOWER_STRATOSPHERE):
             temperature = LOWER_STRATOSPHERE_OFFSET + LOWER_STRATOSPHERE_GAIN * altitudeInMeters
             temperature = round(temperature,2)
             altitudeInMeters = round(altitudeInMeters,2)
-            print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
+            #print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
          # Upper stratosphere
          else:
             temperature = UPPER_STRATOSPHERE_OFFSET + UPPER_STRATOSPHERE_GAIN * altitudeInMeters
             temperature = round(temperature,2)
             altitudeInMeters = round(altitudeInMeters,2)
-            print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
+            #print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
       else:
          # Read CPU temperature and use that as an approximation
         try:
          cpu = CPUTemperature()
          temperature = cpu.temperature + CPU_TEMP_OFFSET
          temperature = round(temperature,2)
-         altitudeInMeters = round(altitudeInMeters,2)
-         print("Altitude = ", altitudeInMeters, "Temperature =", temperature)
+         print("CPU Temperature =", temperature)
         except:
-         DinoLog.logMsg("ERROR - Could Read CPU Temperature.")
+         DinoLog.logMsg("ERROR - Could Not Read CPU Temperature.")
          print("Could not read CPU temperature")
 
 
@@ -307,11 +306,11 @@ class DinoMain(object):
          #Read all sensor data and serial data
 
           # Run thermal algorithm
-        try:
-         self._runThermalControl()  #need to run thermal control even before communication with NRFF
-        except:
-         DinoLog.logMsg("ERROR - Failed Thermal Control.")
-         print("Failed Thermal Control")
+         try:
+          self._runThermalControl()  #need to run thermal control even before communication with NRFF
+         except:
+          DinoLog.logMsg("ERROR - Failed Thermal Control.")
+          print("Failed Thermal Control")
 
          try:
           currMet = DinoTime.getMET()
@@ -340,7 +339,7 @@ class DinoMain(object):
              DinoLog.logMsg("ERROR - Could not decode serial data.")
              continue
         
-         #print(data_in)
+         print(data_in)
          self._readAllData()
          DinoLog.logData(self._data)
          # Determine experiment state
