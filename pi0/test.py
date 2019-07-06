@@ -89,6 +89,14 @@ def testDinoTime():
    testEquals(testName, testDesc, newMet-refMet, 10.0, 0.01)
 
 
+def testDinoLogProducer(id, numMsgs, stopFlag):
+   while(not stopFlag.isSet()):
+      sleep(0.00001)
+   for i in range(numMsgs):
+      DinoLog.logMsg("Thread " + str(id) + " - msg #" + str(i))
+      #TODO replace with very small random delays
+      sleep(0.00000001)
+
 def testDinoLog():
 
    # Test variables
@@ -103,11 +111,92 @@ def testDinoLog():
    obj2 = DinoLog("results-diff-2")
    testEquals(testName, testDesc, obj1, obj2)
 
-   # Log message + data files
-   DinoLog.logMsg("test1")
-   DinoLog.logMsg("test2")
-   DinoLog.logMsg("test3")
+   filename = obj1.getFilename()
+   testDesc = "Filename assigned"
+   testNotNone(testName, testDesc, filename)   
+
+   # Default msgId and dataId counters
+   testDesc = "Check default msgId counter."
+   msgId = obj1.getMsgId()
+   testEquals(testName, testDesc, msgId, 0)
+   testDesc = "Check default dataId counter."
+   dataId = obj1.getDataId()
+   testEquals(testName, testDesc, dataId, 0)
    
+   printSubheading(testName, "Message Logging")
+   
+   # Write a single messages and confirm counters are incrementing
+   testDesc = "Check msgId incremented after writing."
+   DinoLog.logMsg("Test 1")
+   msgId += 1
+   testEquals(testName, testDesc, msgId, obj1.getMsgId())   
+   testDesc = "Check dataId incremented after writing."
+   DinoLog.logData(["Test", "2"])
+   dataId += 1
+   testEquals(testName, testDesc, msgId, obj1.getDataId())   
+   
+   # Write NUM_MSGS messages in close succession and confirm the 
+   # counters incremented correctly.
+   NUM_MSGS = 10
+   for i in range(NUM_MSGS):
+      DinoLog.logMsg("Test 3")
+      DinoLog.logData(["Test", "3"])
+   testDesc = "Check msgId incremented after 10 entries."
+   msgId += NUM_MSGS
+   testEquals(testName, testDesc, msgId, obj1.getMsgId())   
+   testDesc = "Check dataId incremented after 10 entries."
+   dataId += NUM_MSGS
+   testEquals(testName, testDesc, dataId, obj1.getDataId())   
+   
+   printSubheading(testName, "Multithreaded log test")
+
+   # Multithreaded test.
+   NUM_THREADS = 10
+   NUM_MSGS    = 20
+   threads = [None] * NUM_THREADS
+   try:
+      # Create all the threads 
+      stopFlag = Event()
+      stopFlag.clear()
+      for i in range(NUM_THREADS):
+         threads[i] = Thread(target=testDinoLogProducer, args=(i, NUM_MSGS, stopFlag))
+         threads[i].start()
+         
+      # Tell threads to start logging messages
+      stopFlag.set()
+      
+      # Wait for all threads to complete. 
+      for i in range(NUM_THREADS):
+         threads[i].join()
+         
+   except Exception as e: 
+      print("ERROR - Could not create thread for test.")
+      print("      - " + str(e))      
+      
+   testDesc = "Check msgId incremented from multiple threads."
+   msgId += NUM_MSGS * NUM_THREADS
+   testEquals(testName, testDesc, msgId, obj1.getMsgId())   
+   testDesc = "Check dataId did not change from multiple threads."
+   dataId += 0
+   testEquals(testName, testDesc, dataId, obj1.getDataId())      
+
+   # Stop log
+   DinoLog.stopLog()
+   sleep(1)
+   
+   printSubheading(testName, "Logfile Review")
+   
+   # Read file and confirm the correct number of lines were written
+   fp = open(filename, "r")      
+   testDesc = "Confirm log file exists."
+   testNotNone(testName, testDesc, fp)
+   
+   numLines = 0
+   for line in fp:
+      numLines += 1
+   testDesc = "Confirm correct number of lines written to the file."
+   testEquals(testName, testDesc, numLines, msgId + dataId + 2)
+
 
 def testDinoCamera():
 
@@ -497,4 +586,4 @@ if(__name__ == "__main__"):
 
    printHeading("End test (" + strftime("%Y%m%d-%H%M%S") + ")")
    printResults()
-   DinoLog.stopLog()
+   

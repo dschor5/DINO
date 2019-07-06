@@ -7,8 +7,6 @@ import queue
 
 from DinoTime import *
 
-#TODO - Update to support re-entrancy. 
-
 # Unique identifiers to differenciate data and messages
 # recorded to the log. 
 DATA_ID        = "D"
@@ -34,6 +32,16 @@ class DinoLog(object):
    Provides interface for logging messages at runtime. 
    The class abstracts some functionality to add timestamps 
    and unique identifiers to facilitate parsing the log.
+   
+   The Log follows a Consumer-Produced pattern. 
+   All other threads act as producers of log messages 
+   that call a static funciton that adds entries into 
+   a message queue. The logging thread consumes all 
+   the messages and writes them to a file. 
+   
+   With this architecture, the slower write operations
+   on a shared resource do not become a blocking 
+   component
    """
 
    # DinoLog Singleton instance 
@@ -60,10 +68,10 @@ class DinoLog(object):
       if(DinoLog.__instance is None):
          DinoLog.__instance = object.__new__(cls)
 
+         # Variables for producer-consumer thread.
          DinoLog.__thread   = None
          DinoLog.__stop     = None
          DinoLog.__msgQueue = None
-
 
          # Generate filename for archive and create a new folder to store the data.
          timestamp = DinoTime.getTimestampStr()
@@ -72,7 +80,8 @@ class DinoLog(object):
          if(not os.path.exists(os.path.dirname(DinoLog.__filepath))):
             os.mkdir(os.path.dirname(DinoLog.__filepath))
 
-         # Initialize message queue
+         # Initialize message queue. 
+         # Note that Python's message queue is thread-safe.
          try:
             DinoLog.__msgQueue = queue.Queue(BUF_SIZE)
             DinoLog.__msgQueue.put(EVENT_ID + "0" + CSV_SEP + \
@@ -91,19 +100,27 @@ class DinoLog(object):
             
          # Initialize counters for logging.
          DinoLog.__msgId = 0
-         DinoLog.__dataId = 0    
-         DinoLog.__startLog(DinoLog.__instance)     
+         DinoLog.__dataId = 0   
+         
+         # Start thread. Left to the end of the object creation
+         # to ensure all other parts had been instantiated. 
+         DinoLog.__startLog(DinoLog.__instance)
+         
       return DinoLog.__instance
    
    
    def __startLog(self):
+      """
+      Starts logging thread.
+      """
       try:
          self.__stop.clear()
          self.__thread = Thread(target=self.__run, args=(self.__stop, self.__msgQueue, self.__filepath,))
          self.__thread.start()
       except Exception as e: 
-         print(e)
          print("ERROR - Could not create thread for DinoLog.")
+         print("      - " + str(e))
+   
    
    @staticmethod
    def getFolder():
@@ -130,6 +147,18 @@ class DinoLog(object):
       return self.__filepath
 
 
+   def getMsgId(self):
+      """
+      Get message id.
+      
+      Returns
+      -------
+      id : int
+         Counter for number of messages received.
+      """
+      return self.__msgId;
+   
+
    @staticmethod
    def logMsg(msg):
       """
@@ -155,6 +184,19 @@ class DinoLog(object):
       """
       DinoLog.__msgId = DinoLog.__msgId + 1
       DinoLog.__msgQueue.put(EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + msg.replace(CSV_SEP, SAFE_SEP))   
+
+
+   def getDataId(self):
+      """
+      Get data id.
+      
+      Returns
+      -------
+      id : int
+         Counter for number of messages received.
+      """
+      return self.__dataId;
+      
 
    @staticmethod
    def logData(data):
@@ -204,7 +246,6 @@ class DinoLog(object):
       except:
          return False
       return True
-      
 
    def __run(self, stopEvent, msgQueue, filepath):
       """ 
@@ -246,8 +287,15 @@ class DinoLog(object):
             if(fp is None):
                fp = open(filepath, 'a')
             fp.write(logEntry)
+            
+            # Flushing after each entry is slow, but ensures that
+            # if the system crashes, anything sent up to that point
+            # would have been saved.
             fp.flush()      
-            time.sleep(0.02)
+            
+            # Slow delay after each operation such that the thread 
+            # does not hog the processor while waiting for messages.
+            time.sleep(0.00001)
       
       # Close log
       fp.close()
