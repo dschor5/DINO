@@ -104,8 +104,9 @@ def testDinoLog():
    testEquals(testName, testDesc, obj1, obj2)
 
    # Log message + data files
-   # Attempt to close the file and ensure it is re-opened
-   # Parse back last 5 entries of each type and confirm they are working
+   DinoLog.logMsg("test1")
+   DinoLog.logMsg("test2")
+   DinoLog.logMsg("test3")
    
 
 def testDinoCamera():
@@ -496,3 +497,4 @@ if(__name__ == "__main__"):
 
    printHeading("End test (" + strftime("%Y%m%d-%H%M%S") + ")")
    printResults()
+   DinoLog.stopLog()

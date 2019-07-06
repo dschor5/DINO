@@ -378,4 +378,9 @@ class DinoMain(object):
          # there should be serial data readily available.
          sleep(0.1)
          
-
+         
+   def __del__(self):
+      """
+      Destructor to ensure the log file is closed.
+      """
+      DinoLog.stopLog()

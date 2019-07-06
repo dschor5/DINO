@@ -1,6 +1,9 @@
+from threading     import Thread # Thread to record continuously
+from threading     import Event  # Events for communicating within threads
 import time
 import os
 import sys
+import queue
 
 from DinoTime import *
 
@@ -19,6 +22,9 @@ SAFE_SEP       = ";"
 
 # Format for data/event counters in the log.
 MET_STR_FORMAT = "0>8.2f"
+
+# Size of message queue buffer
+BUF_SIZE = 100
 
 
 class DinoLog(object):
@@ -54,6 +60,11 @@ class DinoLog(object):
       if(DinoLog.__instance is None):
          DinoLog.__instance = object.__new__(cls)
 
+         DinoLog.__thread   = None
+         DinoLog.__stop     = None
+         DinoLog.__msgQueue = None
+
+
          # Generate filename for archive and create a new folder to store the data.
          timestamp = DinoTime.getTimestampStr()
          DinoLog.__folder = "Logs/" + archiveName + "_" + timestamp
@@ -61,16 +72,38 @@ class DinoLog(object):
          if(not os.path.exists(os.path.dirname(DinoLog.__filepath))):
             os.mkdir(os.path.dirname(DinoLog.__filepath))
 
-         # Log initial entry to the file.
-         DinoLog.__fp = None
-         DinoLog.__instance.__log(EVENT_ID + "0" + CSV_SEP + \
-             "Log file \"" + DinoLog.__filepath + "\" initialized.")
-
+         # Initialize message queue
+         try:
+            DinoLog.__msgQueue = queue.Queue(BUF_SIZE)
+            DinoLog.__msgQueue.put(EVENT_ID + "0" + CSV_SEP + \
+               "Log file \"" + DinoLog.__filepath + "\" initialized.")
+         except:
+            print("ERROR - Could not create msgQueue for Log.")
+                  
+         # Create event to notify log thread when to stop.
+         # While this could have been done with a lock, the event 
+         # has built in functions for checking if a flag is set.
+         try:
+            DinoLog.__stop = Event()
+            DinoLog.__stop.set()
+         except:
+            print("ERROR - Could not create event for Log.")
+            
          # Initialize counters for logging.
          DinoLog.__msgId = 0
-         DinoLog.__dataId = 0         
+         DinoLog.__dataId = 0    
+         DinoLog.__startLog(DinoLog.__instance)     
       return DinoLog.__instance
    
+   
+   def __startLog(self):
+      try:
+         self.__stop.clear()
+         self.__thread = Thread(target=self.__run, args=(self.__stop, self.__msgQueue, self.__filepath,))
+         self.__thread.start()
+      except Exception as e: 
+         print(e)
+         print("ERROR - Could not create thread for DinoLog.")
    
    @staticmethod
    def getFolder():
@@ -121,9 +154,7 @@ class DinoLog(object):
          String to print to the file.       
       """
       DinoLog.__msgId = DinoLog.__msgId + 1
-      DinoLog.__log(DinoLog.__instance, \
-         EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + \
-         msg.replace(CSV_SEP, SAFE_SEP))   
+      DinoLog.__msgQueue.put(EVENT_ID + str(DinoLog.__msgId) + CSV_SEP + msg.replace(CSV_SEP, SAFE_SEP))   
 
    @staticmethod
    def logData(data):
@@ -152,56 +183,82 @@ class DinoLog(object):
          else:
             dataList.append(str(i))
       
-      DinoLog.__log(DinoLog.__instance, \
-         DATA_ID + str(DinoLog.__dataId) + CSV_SEP + CSV_SEP.join(dataList))
+      DinoLog.__msgQueue.put(DATA_ID + str(DinoLog.__dataId) + CSV_SEP + CSV_SEP.join(dataList))
 
 
-   def __log(self, msg):
+   @staticmethod
+   def stopLog():
+      """ 
+      Stop thread and close log file. 
+
+      Return
+      ------
+      bool
+         True if the log thread was stopped.
       """
-      Log a message to the log. 
+      DinoLog.logMsg("Log file \"" + str(DinoLog.__filepath) + "\" closed.")
+      DinoLog.__stop.set()
+      try:
+         DinoLog.__thread.join()
+         DinoLog.__thread = None
+      except:
+         return False
+      return True
+      
 
-      The function will append a date/time and MET timestamps
-      separated by CSV_SEP for easy parsing. 
+   def __run(self, stopEvent, msgQueue, filepath):
+      """ 
+      Thread for Log. 
 
-      Open the file if needed. Then log the message and flush
-      the data to the file in case the program is terminated abruptly. 
-      The function keeps the file opened for subsequent writes.
-
+      Read all messages from the message queue and write them to the log. 
+      If a stopEvent is set, then wait until it finishes clearing the queue
+      before closing the file. 
+      
+      The implementation follows a Producer-Consumer design pattern.
+      
       Parameter
       ---------
-      msg : str
-         Message to log to the file.
+      stopEvent : threading.Event
+         Flag to stop this thread from the main application.
+         Set by calling the function stopLog()
+      msgQueue : queue.Queue
+         Log message queue. 
+      filepath : str
+         String containing the log file path
       """
-      # Log entries include both the current time and the MET.
-      timeStr = DinoTime.getTimestampStr()
-      metStr  = format(DinoTime.getMET(), MET_STR_FORMAT)
+      fp = None
+      
+      # Thread runs until it receives a stopEvent
+      while((stopEvent.isSet() == False) or (not msgQueue.empty())):
+      
+         # Read all messages from the queue and write them to the file
+         if(not msgQueue.empty()):
+            msg = str(msgQueue.get())
+            
+            # Log entries include both the current time and the MET.
+            timeStr = DinoTime.getTimestampStr()
+            metStr  = format(DinoTime.getMET(), MET_STR_FORMAT)
 
-      # Format for log messages
-      logEntry = timeStr + CSV_SEP + metStr + CSV_SEP + msg + "\n"
+            # Format for log messages
+            logEntry = timeStr + CSV_SEP + metStr + CSV_SEP + msg + "\n"
 
-      # Log the message. Keep the file open. 
-      if(self.__fp is None):
-         self.__fp = open(self.__filepath, 'a')
-      self.__fp.write(logEntry)
-      self.__fp.flush()      
-      #print(logEntry)
+            # Log the message. Keep the file open. 
+            if(fp is None):
+               fp = open(filepath, 'a')
+            fp.write(logEntry)
+            fp.flush()      
+            time.sleep(0.02)
+      
+      # Close log
+      fp.close()
+      fp = None
 
 
    def __del__(self):
       """
       Destructor to ensure the log file is closed.
       """
-      self.logMsg("Log file \"" + DinoLog.__filepath + "\" closed.")
-      self.closeLog()
-
-
-   def closeLog(self):
-      """
-      Close the log file if it is still opened.
-      """
-      if(self.__fp is not None):
-         self.__fp.close()
-         self.__fp = None
+      self.stopLog()
 
 
 
